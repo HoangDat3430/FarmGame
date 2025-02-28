@@ -1,0 +1,4 @@
+CropID,Stages,RuleTile,GrowthTime,Number of Harvest,Stage after Harvest,Product per Harvest,DieTime
+1,4,Tile_Carrot_0,15,1,1,1,3000
+2,5,Tile_Corn_0,15,2,3,2,3000
+3,5,Tile_Wheat_0,15,1,1,1,3000

@@ -47,8 +47,6 @@ namespace HappyHarvest
         public DayCycleHandler DayCycleHandler { get; set; }
         public Tilemap WalkSurfaceTilemap { get; set; }
         
-        public SceneData LoadedSceneData { get; set; }
-        
         // Will return the ratio of time for the current day between 0 (00:00) and 1 (23:59).
         public float CurrentDayRatio => m_CurrentTimeOfTheDay / DayDurationInSeconds;
 
@@ -65,14 +63,18 @@ namespace HappyHarvest
         
         private float m_CurrentTimeOfTheDay;
 
+        private ItemList m_ItemConfigs = new ItemList();
+        private CropList m_CropConfigs = new CropList();
+
         private void Awake()
         {
             s_Instance = this;
             DontDestroyOnLoad(gameObject);
-            
+            InitConfigData();
+
             m_IsTicking = true;
             
-            SpawnPlayer();
+            //SpawnPlayer();
             m_CurrentTimeOfTheDay = StartingTime;
             
             //we need to ensure that we don't have a day length at 0, otherwise we will get stuck into infinite loop in update
@@ -109,6 +111,19 @@ namespace HappyHarvest
             if(DayCycleHandler != null)
             {
                 DayCycleHandler.Tick();
+            }
+        }
+        private void InitConfigData()
+        {
+            m_ItemConfigs.ReadFile("Data/ItemList.csv");
+            m_CropConfigs.ReadFile("Data/CropList.csv");
+            int dropId = m_CropConfigs.Table[2].cropID;
+            for(int i = 0; i < m_CropConfigs.Table.Length; i++)
+            {
+                if (m_CropConfigs.Table[i].cropID == dropId)
+                {
+                    Debug.Log(m_CropConfigs.Table[i].ruleTile);
+                }
             }
         }
         private void SpawnPlayer()
