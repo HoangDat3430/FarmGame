@@ -4102,11 +4102,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5778089440110620584}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d10c1306c8953e45ad46fa88f49c8ac, type: 3}
+  m_Script: {fileID: 11500000, guid: 048ec9243e48f3c4fa57300e794a133d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _activeColor: {r: 0.99215686, g: 0.9137255, b: 0.5137255, a: 1}
-  _inactiveColor: {r: 0.3137255, g: 0.26666668, b: 0.26666668, a: 0.5019608}
+  _activeColor: {r: 1, g: 1, b: 1, a: 1}
+  _inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!1 &5793583444671434011
 GameObject:
   m_ObjectHideFlags: 0
@@ -5318,7 +5318,7 @@ MonoBehaviour:
   - {x: 0.24273206, y: -0.031362597, z: 0}
   m_ShapePathHash: -216826971
   m_Mesh: {fileID: 0}
-  m_InstanceId: -18186
+  m_InstanceId: 90550
   m_LocalBounds:
     m_Center: {x: 0.022488534, y: 0.0065009817, z: 0}
     m_Extent: {x: 0.22024353, y: 0.1279166, z: 0}
@@ -5570,7 +5570,7 @@ MonoBehaviour:
   - {x: 0.24273206, y: -0.031362597, z: 0}
   m_ShapePathHash: -216826971
   m_Mesh: {fileID: 0}
-  m_InstanceId: -18160
+  m_InstanceId: 90758
   m_LocalBounds:
     m_Center: {x: 0.022488534, y: 0.0065009817, z: 0}
     m_Extent: {x: 0.22024353, y: 0.1279166, z: 0}
