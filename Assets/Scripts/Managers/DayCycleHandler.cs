@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 #endif
 
-namespace HappyHarvest
+namespace Farm
 {
 
     /// <summary>
@@ -84,23 +84,6 @@ namespace HappyHarvest
             while (currentShadowAngle > 1.0f)
                 currentShadowAngle -= 1.0f;
         }
-        
-        public void Save(ref DayCycleHandlerSaveData data)
-        {
-            //data.TimeOfTheDay = m_CurrentTimeOfTheDay;
-        }
-        
-        public void Load(DayCycleHandlerSaveData data)
-        {
-            //m_CurrentTimeOfTheDay = data.TimeOfTheDay;
-            //StartingTime = m_CurrentTimeOfTheDay;
-        }
-    }
-
-    [System.Serializable]
-    public struct DayCycleHandlerSaveData
-    {
-        public float TimeOfTheDay;
     }
     
     

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-namespace HappyHarvest
+namespace Farm
 {
     /// <summary>
     /// The GameManager is the entry point to all the game system. It's execution order is set very low to make sure
@@ -66,6 +66,9 @@ namespace HappyHarvest
         private ItemList m_ItemConfigs = new ItemList();
         private CropList m_CropConfigs = new CropList();
 
+        private Dictionary<int, ItemList.RowData> itemDic = new Dictionary<int, ItemList.RowData>();
+        private Dictionary<int, ItemList.RowData> cropDic = new Dictionary<int, ItemList.RowData>();
+        
         private void Awake()
         {
             s_Instance = this;
@@ -74,7 +77,7 @@ namespace HappyHarvest
 
             m_IsTicking = true;
             
-            //SpawnPlayer();
+            SpawnPlayer();
             m_CurrentTimeOfTheDay = StartingTime;
             
             //we need to ensure that we don't have a day length at 0, otherwise we will get stuck into infinite loop in update
@@ -117,14 +120,6 @@ namespace HappyHarvest
         {
             m_ItemConfigs.ReadFile("Data/ItemList.csv");
             m_CropConfigs.ReadFile("Data/CropList.csv");
-            int dropId = m_CropConfigs.Table[2].cropID;
-            for(int i = 0; i < m_CropConfigs.Table.Length; i++)
-            {
-                if (m_CropConfigs.Table[i].cropID == dropId)
-                {
-                    Debug.Log(m_CropConfigs.Table[i].ruleTile);
-                }
-            }
         }
         private void SpawnPlayer()
         {
@@ -138,6 +133,10 @@ namespace HappyHarvest
                 Instance.MainCamera.LookAt = playerTransform;
                 Instance.MainCamera.ForceCameraPosition(playerTransform.position, Quaternion.identity);
             }
+        }
+        public ItemList.RowData GetItemByID(int itemId)
+        {
+            return m_ItemConfigs.GetByItemId(itemId);
         }
     }
 }
