@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 using UnityEngine.VFX;
 
 
@@ -85,6 +86,79 @@ namespace Farm
         private Dictionary<Vector3Int, GroundData> m_GroundData = new();
         private Dictionary<Vector3Int, CropData> m_CropData = new();
 
+        private Dictionary<int, List<Vector3Int>> fieldGroups = new Dictionary<int, List<Vector3Int>>();
+
+        void Awake()
+        {
+            GameManager.Instance.Terrain = this;
+            GroupTilesByFields();
+        }
+
+        void GroupTilesByFields()
+        {
+            fieldGroups.Clear();
+
+            BoundsInt bounds = GroundTilemap.cellBounds;
+            Dictionary<Vector3Int, int> visited = new Dictionary<Vector3Int, int>(); // Track visited tiles
+
+            int fieldID = 1; // Start ID for fields
+
+            for (int x = bounds.xMin; x < bounds.xMax; x++)
+            {
+                for (int y = bounds.yMin; y < bounds.yMax; y++)
+                {
+                    Vector3Int position = new Vector3Int(x, y, 0);
+
+                    if (GroundTilemap.GetTile(position) != null && !visited.ContainsKey(position))
+                    {
+                        // Perform flood-fill to collect all connected tiles of the same type
+                        List<Vector3Int> fieldTiles = FloodFill(GroundTilemap, position, visited, fieldID);
+
+                        if (fieldTiles.Count > 0)
+                        {
+                            fieldGroups[fieldID] = fieldTiles;
+                            fieldID++; // Increment field ID for the next group
+                        }
+                    }
+                }
+            }
+        }
+        List<Vector3Int> FloodFill(Tilemap tilemap, Vector3Int start, Dictionary<Vector3Int, int> visited, int fieldID)
+        {
+            List<Vector3Int> fieldTiles = new List<Vector3Int>();
+            Queue<Vector3Int> queue = new Queue<Vector3Int>();
+            queue.Enqueue(start);
+            TileBase tileType = tilemap.GetTile(start);
+
+            while (queue.Count > 0)
+            {
+                Vector3Int current = queue.Dequeue();
+
+                if (!visited.ContainsKey(current) && tilemap.GetTile(current) == tileType)
+                {
+                    visited[current] = fieldID;
+                    fieldTiles.Add(current);
+
+                    // Check 4-directional neighbors (Up, Down, Left, Right)
+                    Vector3Int[] neighbors = {
+                    new Vector3Int(current.x + 1, current.y, 0),
+                    new Vector3Int(current.x - 1, current.y, 0),
+                    new Vector3Int(current.x, current.y + 1, 0),
+                    new Vector3Int(current.x, current.y - 1, 0)
+                };
+
+                    foreach (Vector3Int neighbor in neighbors)
+                    {
+                        if (!visited.ContainsKey(neighbor) && tilemap.GetTile(neighbor) == tileType)
+                        {
+                            queue.Enqueue(neighbor);
+                        }
+                    }
+                }
+            }
+
+            return fieldTiles;
+        }
         public bool IsTillable(Vector3Int target)
         {
             return GroundTilemap.GetTile(target) == TilleableTile;
@@ -103,10 +177,20 @@ namespace Farm
         public void TillAt(Vector3Int target)
         {
             if (IsTilled(target))
+            {
                 return;
-
-            GroundTilemap.SetTile(target, TilledTile);
-            m_GroundData.Add(target, new GroundData());
+            }
+            foreach (var field in fieldGroups)
+            {
+                if (field.Value.Contains(target))  // Check if the position exists in the field
+                {
+                    foreach(var pos in fieldGroups[field.Key])
+                    {
+                        GroundTilemap.SetTile(pos, TilledTile);
+                        m_GroundData.Add(pos, new GroundData());
+                    }
+                }
+            }
         }
 
         public void PlantAt(Vector3Int target, Crop cropToPlant)
@@ -167,12 +251,6 @@ namespace Farm
 
             UpdateCropVisual(target);
         }
-
-        private void Awake()
-        {
-            GameManager.Instance.Terrain = this;
-        }
-
         private void Update()
         {
             foreach (var (cell, groundData) in m_GroundData)
@@ -216,7 +294,6 @@ namespace Farm
                 }
             }
         }
-
         void UpdateCropVisual(Vector3Int target)
         {
             if (!m_CropData.TryGetValue(target, out var data))
