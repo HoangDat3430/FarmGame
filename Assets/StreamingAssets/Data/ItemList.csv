@@ -1,10 +1,10 @@
 ItemID,Item Name,Buy Price,Sell Price,Prefab,Icon,Max Stack Size,CropID,Comsumable,Animation
-1,Basket,-1,-1,Prefab_Basket_Visual,Sprite_Basket,1,-1,0,Picking
-2,Hoe,-1,-1,Prefab_Tool_Hoe,hoe_icon,1,-1,0,ToolSwing
-3,Water Can,-1,-1,Prefab_Tool_WaterCan,Sprite_WaterCan_Icon,1,-1,0,Watering
-4,Carrot,-1,10,Carrot_Product,Sprite_Carrot_icon,10,-1,0,
-5,Corn,-1,10,Corn_Product,Sprite_Corn_icon,10,-1,0,
-6,Wheat,-1,2,Wheat_Product,Sprite_Wheat_icon,10,-1,0,
-7,Seed (Carrot),10,-1,Carrot_Seed_Visual,Sprite_Carrot_seedbag,10,1,1,Planting
-8,Seed (Corn),15,-1,Corn_Seed_Visual,Sprite_Corn_seedbag,10,2,1,Planting
-9,Seed (Wheat),1,-1,Wheat_Seed_Visual,Sprite_Wheat_seedbag,10,3,1,Planting
+1,Basket,-1,-1,Prefabs/Tools/Prefab_Basket_Visual,Sprite_Basket,1,-1,0,Picking
+2,Hoe,-1,-1,Prefabs/Tools/Prefab_Tool_Hoe,hoe_icon,1,-1,0,ToolSwing
+3,Water Can,-1,-1,Prefabs/Tools/Prefab_Tool_WaterCan,Sprite_WaterCan_Icon,1,-1,0,Watering
+4,Carrot,-1,10,Prefabs/Carrot/Carrot_Product,Sprite_Carrot_icon,10,-1,0,
+5,Corn,-1,10,Prefabs/Corn/Corn_Product,Sprite_Corn_icon,10,-1,0,
+6,Wheat,-1,2,Prefabs/Wheat/Wheat_Product,Sprite_Wheat_icon,10,-1,0,
+7,Seed (Carrot),10,-1,Prefabs/Carrot/Carrot_Seed_Visual,Sprite_Carrot_seedbag,10,1,1,Planting
+8,Seed (Corn),15,-1,Prefabs/Corn/Corn_Seed_Visual,Sprite_Corn_seedbag,10,2,1,Planting
+9,Seed (Wheat),1,-1,Prefabs/Wheat/Wheat_Seed_Visual,Sprite_Wheat_seedbag,10,3,1,Planting

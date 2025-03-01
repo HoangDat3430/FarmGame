@@ -270,16 +270,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 3234746541622817088}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cb840d25cccd5b42931218c7fd1b1f1, type: 3}
+  m_Script: {fileID: 11500000, guid: c7a4d208198c4a4499d1d0db0c7fbe35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InputAction: {fileID: -944628639613478452, guid: a3fe6542f5ad43b4ca5a13f38d18fa3a, type: 3}
+  InputAction: {fileID: -944628639613478452, guid: 89f067b6212a802469d915e662124b7e, type: 3}
   Speed: 10
   Target: {fileID: 3750279862118807271}
   ItemAttachBone: {fileID: 6443841990207896347}
   m_Coins: 10
-  m_Inventory:
-    Entries: []
 --- !u!1001 &5857271095455295569
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -638,7 +636,7 @@ PrefabInstance:
       objectReference: {fileID: 7108339969198208228, guid: a6cc160a4bc64e84aa1951bb696b4219, type: 3}
     - target: {fileID: 6162249866354045869, guid: eddd2e432c6d6fc44833b807d0118d54, type: 3}
       propertyPath: m_InstanceId
-      value: -57076
+      value: -15462
       objectReference: {fileID: 0}
     - target: {fileID: 6162249866354045869, guid: eddd2e432c6d6fc44833b807d0118d54, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -670,7 +668,7 @@ PrefabInstance:
       objectReference: {fileID: -598832424630689206, guid: 9ba7ae11f0d6fa14e953a6a9f622c449, type: 3}
     - target: {fileID: 6325339351077406860, guid: eddd2e432c6d6fc44833b807d0118d54, type: 3}
       propertyPath: m_InstanceId
-      value: -57102
+      value: -15488
       objectReference: {fileID: 0}
     - target: {fileID: 6325339351077406860, guid: eddd2e432c6d6fc44833b807d0118d54, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
