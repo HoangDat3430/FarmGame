@@ -352,8 +352,6 @@ namespace Farm
             {
                 var newVisual = Instantiate(visualPrefab, ItemAttachBone, false);
                 newVisual.SetActive(false);
-                Debug.Log(item.PlayerAnimatorTriggerUse);
-
                 m_ItemVisualInstance[item] = new ItemInstance()
                 {
                     Instance = newVisual,
