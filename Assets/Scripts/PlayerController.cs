@@ -347,11 +347,13 @@ namespace Farm
         void CreateItemVisual(Item item)
         {
             GameObject visualPrefab = Resources.Load(item.PrefabPath) as GameObject;
+            Debug.Log(visualPrefab);
             if (visualPrefab != null && !m_ItemVisualInstance.ContainsKey(item))
             {
                 var newVisual = Instantiate(visualPrefab, ItemAttachBone, false);
                 newVisual.SetActive(false);
-                
+                Debug.Log(item.PlayerAnimatorTriggerUse);
+
                 m_ItemVisualInstance[item] = new ItemInstance()
                 {
                     Instance = newVisual,

@@ -38,7 +38,12 @@ namespace Farm
             }
             Entries[0].Item = new Hoe();
             Entries[0].StackSize = 1;
-            Entries[0].Item.Init();
+            Entries[1].Item = new Basket();
+            Entries[0].StackSize = 1;
+            Entries[2].Item = new WaterCan();
+            Entries[0].StackSize = 1;
+            Entries[3].Item = new CarrotSeedBag();
+            Entries[0].StackSize = 10;
             EquippedItemIdx = 0;
         }
 
@@ -131,42 +136,18 @@ namespace Farm
             return remainingToFit == 0;
         }
 
-        //return the actual amount removed
-        public int Remove(int index, int count)
-        {
-            if (index < 0 || index >= Entries.Length)
-                return 0;
-
-            int amount = Mathf.Min(count, Entries[index].StackSize);
-
-            Entries[index].StackSize -= amount;
-
-            if (Entries[index].StackSize == 0)
-            {
-                Entries[index].Item = null;
-            }
-
-            return amount;
-        }
-
         public void EquipNext()
         {
             EquippedItemIdx += 1;
             if (EquippedItemIdx >= InventorySize) EquippedItemIdx = 0;
+            Debug.LogError(EquippedItem);
         }
 
         public void EquipPrev()
         {
             EquippedItemIdx -= 1;
             if (EquippedItemIdx < 0) EquippedItemIdx = InventorySize - 1;
-        }
-
-        public void EquipItem(int index)
-        {
-            if (index < 0 || index >= Entries.Length)
-                return;
-
-            EquippedItemIdx = index;
+            Debug.LogError(EquippedItem);
         }
     }
 }

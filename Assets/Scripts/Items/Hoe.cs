@@ -4,10 +4,8 @@ namespace Farm
 {
     public class Hoe : Item
     {
-        public override void Init()
+        public Hoe() : base(2)
         {
-            ItemID = 2;
-            base.Init();
         }
         public override bool CanUse(Vector3Int target)
         {

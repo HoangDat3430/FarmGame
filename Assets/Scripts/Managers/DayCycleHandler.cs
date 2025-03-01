@@ -112,7 +112,7 @@ namespace Farm
             {
                 m_Target.UpdateLight(evt.newValue);
                 
-                slider.label = $"Test Time {DayEvent.GetTimeAsString(evt.newValue)} ({evt.newValue:F2})";
+                //slider.label = $"Test Time {DayEvent.GetTimeAsString(evt.newValue)} ({evt.newValue:F2})";
                 SceneView.RepaintAll();
             }));
             

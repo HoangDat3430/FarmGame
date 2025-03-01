@@ -52,7 +52,6 @@ namespace Farm
                 GrowthTimer = 0.0f;
                 CurrentGrowthStage = 0;
                 HarvestCount = 0;
-
                 DyingTimer = 0.0f;
             }
 
@@ -67,26 +66,6 @@ namespace Farm
                 GrowthTimer = GrowingCrop.GrowthTime * GrowthRatio;
 
                 return crop;
-            }
-
-            public void Save(ref SaveData data)
-            {
-                data.Stage = CurrentGrowthStage;
-                data.CropId = GrowingCrop.Key;
-                data.DyingTimer = DyingTimer;
-                data.GrowthRatio = GrowthRatio;
-                data.GrowthTimer = GrowthTimer;
-                data.HarvestCount = HarvestCount;
-            }
-
-            public void Load(SaveData data)
-            {
-                CurrentGrowthStage = data.Stage;
-                //GrowingCrop = GameManager.Instance.CropDatabase.GetFromID(data.CropId);
-                DyingTimer = data.DyingTimer;
-                GrowthRatio = data.GrowthRatio;
-                GrowthTimer = data.GrowthTimer;
-                HarvestCount = data.HarvestCount;
             }
         }
 
@@ -135,6 +114,7 @@ namespace Farm
             var cropData = new CropData();
 
             cropData.GrowingCrop = cropToPlant;
+            Debug.LogError(cropData.GrowingCrop.GrowthStagesTiles[0]);
             cropData.GrowthTimer = 0.0f;
             cropData.CurrentGrowthStage = 0;
 

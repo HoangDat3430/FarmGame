@@ -138,5 +138,9 @@ namespace Farm
         {
             return m_ItemConfigs.GetByItemId(itemId);
         }
+        public CropList.RowData GetCropByID(int cropId)
+        {
+            return m_CropConfigs.GetByCropId(cropId);
+        }
     }
 }
