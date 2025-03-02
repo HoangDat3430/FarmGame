@@ -42,9 +42,9 @@ namespace Farm
             Entries[1].StackSize = 1;
             Entries[2].Item = new WaterCan();
             Entries[2].StackSize = 1;
-            Entries[3].Item = new CarrotSeedBag();
+            Entries[3].Item = new CornSeedBag();
             Entries[3].StackSize = 10;
-            Entries[4].Item = new CornSeedBag();
+            Entries[4].Item = new WheatSeedBag();
             Entries[4].StackSize = 10;
             EquippedItemIdx = 0;
         }
