@@ -39,11 +39,13 @@ namespace Farm
             Entries[0].Item = new Hoe();
             Entries[0].StackSize = 1;
             Entries[1].Item = new Basket();
-            Entries[0].StackSize = 1;
+            Entries[1].StackSize = 1;
             Entries[2].Item = new WaterCan();
-            Entries[0].StackSize = 1;
+            Entries[2].StackSize = 1;
             Entries[3].Item = new CarrotSeedBag();
-            Entries[0].StackSize = 10;
+            Entries[3].StackSize = 10;
+            Entries[4].Item = new CornSeedBag();
+            Entries[4].StackSize = 10;
             EquippedItemIdx = 0;
         }
 
@@ -80,7 +82,7 @@ namespace Farm
             {
                 if (Entries[i].Item == newItem)
                 {
-                    int size = newItem.StackSize - Entries[i].StackSize;
+                    int size = newItem.MaxStackSize - Entries[i].StackSize;
                     toFit -= size;
 
                     if (toFit <= 0)
@@ -92,7 +94,7 @@ namespace Farm
             {
                 if (Entries[i].Item == null)
                 {
-                    toFit -= newItem.StackSize;
+                    toFit -= newItem.MaxStackSize;
                     if (toFit <= 0)
                         return true;
                 }
@@ -107,9 +109,9 @@ namespace Farm
             //first we check if there is already that item in the inventory
             for (int i = 0; i < InventorySize; ++i)
             {
-                if (Entries[i].Item == newItem && Entries[i].StackSize < newItem.StackSize)
+                if (Entries[i].Item == newItem && Entries[i].StackSize < newItem.MaxStackSize)
                 {
-                    int fit = Mathf.Min(newItem.StackSize - Entries[i].StackSize, remainingToFit);
+                    int fit = Mathf.Min(newItem.MaxStackSize - Entries[i].StackSize, remainingToFit);
                     Entries[i].StackSize += fit;
                     remainingToFit -= fit;
                     if (remainingToFit == 0)
@@ -123,7 +125,7 @@ namespace Farm
                 if (Entries[i].Item == null)
                 {
                     Entries[i].Item = newItem;
-                    int fit = Mathf.Min(newItem.StackSize - Entries[i].StackSize, remainingToFit);
+                    int fit = Mathf.Min(newItem.MaxStackSize - Entries[i].StackSize, remainingToFit);
                     remainingToFit -= fit;
                     Entries[i].StackSize = fit;
 
@@ -140,14 +142,20 @@ namespace Farm
         {
             EquippedItemIdx += 1;
             if (EquippedItemIdx >= InventorySize) EquippedItemIdx = 0;
-            Debug.LogError(EquippedItem);
+            if (EquippedItem != null)
+            {
+                Debug.LogError(EquippedItem.ItemName + " " + Entries[EquippedItemIdx].StackSize);
+            }
         }
 
         public void EquipPrev()
         {
             EquippedItemIdx -= 1;
             if (EquippedItemIdx < 0) EquippedItemIdx = InventorySize - 1;
-            Debug.LogError(EquippedItem);
+            if (EquippedItem != null)
+            {
+                Debug.LogError(EquippedItem.ItemName + " " + Entries[EquippedItemIdx].StackSize);
+            }
         }
     }
 }

@@ -202,7 +202,14 @@ namespace Farm
             
             if (m_Inventory.EquippedItem != null && m_Inventory.EquippedItem.NeedTarget() && !m_HasTarget) return;
             
-            UseItem();
+            List<Vector3Int> tiles = GameManager.Instance.Terrain.GetFieldByTile(m_CurrentTarget);
+            if(tiles != null)
+            {
+                for (int i = 0; i < tiles.Count; i++)
+                {
+                    UseItem(tiles[i]);
+                }
+            }
         }
 
         void FixedUpdate()
@@ -279,14 +286,14 @@ namespace Farm
             }
         }
 
-        public void UseItem()
+        public void UseItem(Vector3Int target)
         {
             if(m_Inventory.EquippedItem == null)
                 return;
             
             var previousEquipped = m_Inventory.EquippedItem;
             
-            m_Inventory.UseEquippedObject(m_CurrentTarget);
+            m_Inventory.UseEquippedObject(target);
 
             if (m_ItemVisualInstance.ContainsKey(previousEquipped))
             {
@@ -347,7 +354,6 @@ namespace Farm
         void CreateItemVisual(Item item)
         {
             GameObject visualPrefab = Resources.Load(item.PrefabPath) as GameObject;
-            Debug.Log(visualPrefab);
             if (visualPrefab != null && !m_ItemVisualInstance.ContainsKey(item))
             {
                 var newVisual = Instantiate(visualPrefab, ItemAttachBone, false);

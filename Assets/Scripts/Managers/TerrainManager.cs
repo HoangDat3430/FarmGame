@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 using UnityEngine.VFX;
+using static UnityEditor.PlayerSettings;
 
 
 namespace Farm
@@ -159,6 +160,17 @@ namespace Farm
 
             return fieldTiles;
         }
+        public List<Vector3Int> GetFieldByTile(Vector3Int target)
+        {
+            foreach (var field in fieldGroups)
+            {
+                if (field.Value.Contains(target))  // Check if the position exists in the field
+                {
+                    return field.Value;
+                }
+            }
+            return null;
+        }
         public bool IsTillable(Vector3Int target)
         {
             return GroundTilemap.GetTile(target) == TilleableTile;
@@ -180,17 +192,8 @@ namespace Farm
             {
                 return;
             }
-            foreach (var field in fieldGroups)
-            {
-                if (field.Value.Contains(target))  // Check if the position exists in the field
-                {
-                    foreach(var pos in fieldGroups[field.Key])
-                    {
-                        GroundTilemap.SetTile(pos, TilledTile);
-                        m_GroundData.Add(pos, new GroundData());
-                    }
-                }
-            }
+            GroundTilemap.SetTile(target, TilledTile);
+            m_GroundData.Add(target, new GroundData());
         }
 
         public void PlantAt(Vector3Int target, Crop cropToPlant)
@@ -198,7 +201,6 @@ namespace Farm
             var cropData = new CropData();
 
             cropData.GrowingCrop = cropToPlant;
-            Debug.LogError(cropData.GrowingCrop.GrowthStagesTiles[0]);
             cropData.GrowthTimer = 0.0f;
             cropData.CurrentGrowthStage = 0;
 

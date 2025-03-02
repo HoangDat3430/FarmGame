@@ -13,7 +13,7 @@ namespace Farm
         public int SellPrice;
         public string PrefabPath;
         public string IconPath;
-        public int StackSize;
+        public int MaxStackSize;
         public int CropID;
         public bool Consumable;
         public string PlayerAnimatorTriggerUse;
@@ -28,7 +28,7 @@ namespace Farm
             BuyPrice = rowData.BuyPrice;
             PrefabPath = rowData.PrefabPath;
             IconPath = rowData.IconPath;
-            StackSize = rowData.StackSize;
+            MaxStackSize = rowData.StackSize;
             CropID = rowData.CropID;
             Consumable = rowData.Consumable;
             PlayerAnimatorTriggerUse = rowData.Animator;
