@@ -9,7 +9,7 @@
 public class UIHandler
 {
     private IGameUI _gameUI;
-    private int score = 0;
+    private int coin = 0;
 
     public UIHandler(IGameUI gameUI)
     {
@@ -18,8 +18,8 @@ public class UIHandler
 
     public void AddCoin(int amount)
     {
-        score += amount;
-        _gameUI.UpdateCoin(score);
+        coin += amount;
+        _gameUI.UpdateCoin(coin);
     }
     public void ShowMarket()
     {

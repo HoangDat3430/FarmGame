@@ -100,6 +100,7 @@ public class GameUI : MonoBehaviour, IGameUI
     private void SellItem(Item item, int count)
     {
         GameManager.Instance.Player.Inventory.OnSellItem(item, count);
+        UpdateInventoryVisual(true);
         ShowSellList();
     }
     private void ShowBuyList()
@@ -137,13 +138,20 @@ public class GameUI : MonoBehaviour, IGameUI
             Sprite iconSprite = Resources.Load<Sprite>(canBuyList[i].IconPath);
             item.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
             CropList.RowData good = GameManager.Instance.GetCropByID(canBuyList[i].CropID);
-            item.transform.Find("Data/HarvestNum").GetComponent<TMP_Text>().text = good.HarvestNum.ToString();
-            item.transform.Find("Data/GrowthTime").GetComponent<TMP_Text>().text = good.GrowthTime.ToString();
+            item.transform.Find("Data/HarvestNum/Count").GetComponent<TMP_Text>().text = good.HarvestNum.ToString();
+            item.transform.Find("Data/GrowthTime/Count").GetComponent<TMP_Text>().text = good.GrowthTime.ToString();
 
             Item newItem = new Item(canBuyList[i].ItemID);
             Button buttonBuy = item.transform.Find("Buy").GetComponent<Button>();
-            buttonBuy.transform.Find("Price").GetComponent<TMP_Text>().text = canBuyList[i].BuyPrice.ToString();
-            RegisterButtonEvent(buttonBuy, () => BuyItem(newItem, 1));
+            buttonBuy.gameObject.SetActive(!newItem.WholeSale);
+            if (!newItem.WholeSale)
+            {
+                buttonBuy.transform.Find("Price").GetComponent<TMP_Text>().text = canBuyList[i].BuyPrice.ToString();
+                RegisterButtonEvent(buttonBuy, () => BuyItem(newItem, 1));
+            }
+            Button buttonBuyTen = item.transform.Find("Buy10").GetComponent<Button>();
+            buttonBuyTen.transform.Find("Price").GetComponent<TMP_Text>().text = (canBuyList[i].BuyPrice * 10).ToString();
+            RegisterButtonEvent(buttonBuyTen, () => BuyItem(newItem, 10));
 
         }
     }
@@ -153,7 +161,11 @@ public class GameUI : MonoBehaviour, IGameUI
         {
             for(int i = 0; i < count; i++)
             {
-                GameManager.Instance.Player.AddItem(newItem);
+                if (GameManager.Instance.Coin >= newItem.BuyPrice && GameManager.Instance.Player.AddItem(newItem))
+                {
+                    GameManager.Instance.AddCoin(-newItem.BuyPrice);
+                }
+                UpdateInventoryVisual(true);
             }
         }
     }
@@ -177,10 +189,7 @@ public class GameUI : MonoBehaviour, IGameUI
                         text = entry.StackSize.ToString();
                     }
                 }
-                else
-                {
-                    icon.gameObject.SetActive(false);
-                }
+                icon.gameObject.SetActive(entry.Item != null);
                 countT.text = text;
             }
             slot.Find("selected").gameObject.SetActive(i == GameManager.Instance.Player.Inventory.EquippedItemIdx);

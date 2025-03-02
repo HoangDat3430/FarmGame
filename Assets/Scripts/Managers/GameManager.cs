@@ -66,7 +66,7 @@ namespace Farm
 
         private UIHandler uiLogic;
 
-        private int m_Coin = 10;
+        private int m_Coin;
         public int Coin
         {
             get

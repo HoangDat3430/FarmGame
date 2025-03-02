@@ -17,6 +17,7 @@ namespace Farm
         public int CropID;
         public bool Consumable;
         public string PlayerAnimatorTriggerUse;
+        public bool WholeSale;
 
         public Item(int itemID)
         {
@@ -32,6 +33,7 @@ namespace Farm
             CropID = rowData.CropID;
             Consumable = rowData.Consumable;
             PlayerAnimatorTriggerUse = rowData.Animator;
+            WholeSale = rowData.WholeSale;
         }
 
         public virtual bool CanUse(Vector3Int target)
