@@ -113,7 +113,7 @@ namespace Farm
             //first we check if there is already that item in the inventory
             for (int i = 0; i < InventorySize; ++i)
             {
-                if (Entries[i].Item.ItemID == newItem.ItemID && Entries[i].StackSize < newItem.MaxStackSize)
+                if (Entries[i].Item?.ItemID == newItem.ItemID && Entries[i].StackSize < newItem.MaxStackSize)
                 {
                     int fit = Mathf.Min(newItem.MaxStackSize - Entries[i].StackSize, remainingToFit);
                     Entries[i].StackSize += fit;
