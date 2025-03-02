@@ -1,18 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Farm;
 using UnityEngine;
 
-public class Market : MonoBehaviour
+public class Market : InteractiveObject
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void InteractedWith()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GameManager.Instance.OpenMarket();
     }
 }

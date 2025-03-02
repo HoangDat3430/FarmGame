@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace Farm
 {
-    /// <summary>
-    /// Base class for object that can be clicked on in the scene. InteractWith will 
-    /// </summary>
     public abstract class InteractiveObject : MonoBehaviour
     {
         public abstract void InteractedWith();

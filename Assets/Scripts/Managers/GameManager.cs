@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -68,7 +69,17 @@ namespace Farm
 
         private Dictionary<int, ItemList.RowData> itemDic = new Dictionary<int, ItemList.RowData>();
         private Dictionary<int, ItemList.RowData> cropDic = new Dictionary<int, ItemList.RowData>();
-        
+
+        private UIHandler uiLogic;
+
+        private int m_Coin = 10;
+        public int Coin
+        {
+            get
+            {
+                return m_Coin;
+            }
+        }
         private void Awake()
         {
             s_Instance = this;
@@ -92,6 +103,9 @@ namespace Farm
         private void Start()
         {
             m_CurrentTimeOfTheDay = StartingTime;
+            IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
+            uiLogic = new UIHandler(gameUI);
+            AddCoin(10);
         }
 
 #if UNITY_EDITOR
@@ -133,6 +147,15 @@ namespace Farm
                 Instance.MainCamera.LookAt = playerTransform;
                 Instance.MainCamera.ForceCameraPosition(playerTransform.position, Quaternion.identity);
             }
+        }
+        public void OpenMarket()
+        {
+            uiLogic.ShowMarket();
+        }
+        public void AddCoin(int amount)
+        {
+            m_Coin += amount;
+            uiLogic.AddCoin(amount);
         }
         public ItemList.RowData GetItemByID(int itemId)
         {

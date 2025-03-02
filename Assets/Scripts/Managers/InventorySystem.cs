@@ -46,6 +46,12 @@ namespace Farm
             Entries[3].StackSize = 10;
             Entries[4].Item = new WheatSeedBag();
             Entries[4].StackSize = 10;
+            Entries[5].Item = new Product(4);
+            Entries[5].StackSize = 10;
+            Entries[6].Item = new Product(5);
+            Entries[6].StackSize = 10;
+            Entries[7].Item = new Product(6);
+            Entries[8].StackSize = 10;
             EquippedItemIdx = 0;
         }
 
@@ -147,7 +153,6 @@ namespace Farm
                 Debug.LogError(EquippedItem.ItemName + " " + Entries[EquippedItemIdx].StackSize);
             }
         }
-
         public void EquipPrev()
         {
             EquippedItemIdx -= 1;
@@ -155,6 +160,33 @@ namespace Farm
             if (EquippedItem != null)
             {
                 Debug.LogError(EquippedItem.ItemName + " " + Entries[EquippedItemIdx].StackSize);
+            }
+        }
+        public List<InventoryEntry> GetSellableList()
+        {
+            List<InventoryEntry> list = new List<InventoryEntry>();
+            foreach(var entry in Entries)
+            {
+                if(entry.Item != null && entry.Item.SellPrice != -1)
+                {
+                    list.Add(entry);
+                }
+            }
+            return list;
+        }
+        public void SellItem(Item item, int count)
+        {
+            foreach (var entry in Entries)
+            {
+                if (entry.Item != null && entry.Item == item)
+                {
+                    entry.StackSize -= count;
+                    GameManager.Instance.AddCoin(item.SellPrice);
+                    if(entry.StackSize == 0)
+                    {
+                        entry.Item = null;
+                    }
+                }
             }
         }
     }
