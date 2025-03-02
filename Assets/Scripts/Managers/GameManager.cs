@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using Cinemachine;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 namespace Farm
@@ -67,9 +64,6 @@ namespace Farm
         private ItemList m_ItemConfigs = new ItemList();
         private CropList m_CropConfigs = new CropList();
 
-        private Dictionary<int, ItemList.RowData> itemDic = new Dictionary<int, ItemList.RowData>();
-        private Dictionary<int, ItemList.RowData> cropDic = new Dictionary<int, ItemList.RowData>();
-
         private UIHandler uiLogic;
 
         private int m_Coin = 10;
@@ -105,7 +99,7 @@ namespace Farm
             m_CurrentTimeOfTheDay = StartingTime;
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
             uiLogic = new UIHandler(gameUI);
-            AddCoin(10);
+            AddCoin(500);
         }
 
 #if UNITY_EDITOR
@@ -148,6 +142,18 @@ namespace Farm
                 Instance.MainCamera.ForceCameraPosition(playerTransform.position, Quaternion.identity);
             }
         }
+        public List<ItemList.RowData> ItemsToBuy()
+        {
+            List<ItemList.RowData> list = new List<ItemList.RowData>();
+            foreach(var item in m_ItemConfigs.Table)
+            {
+                if(item.BuyPrice != -1)
+                {
+                    list.Add(item);
+                }
+            }
+            return list;
+        }
         public void OpenMarket()
         {
             uiLogic.ShowMarket();
@@ -156,6 +162,10 @@ namespace Farm
         {
             m_Coin += amount;
             uiLogic.AddCoin(amount);
+        }
+        public void UpdateInventoryVisual(bool bForce)
+        {
+            uiLogic.UpdateInventoryVisual(bForce);
         }
         public ItemList.RowData GetItemByID(int itemId)
         {

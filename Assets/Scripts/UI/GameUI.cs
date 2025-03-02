@@ -3,14 +3,16 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Farm;
-using Unity.Mathematics;
-using System;
 using UnityEngine.Events;
+using System.Linq;
 
 public class GameUI : MonoBehaviour, IGameUI
 {
-    public GameObject itemPrefab;
-    public Transform contentPanel;
+    public GameObject itemForSell;
+    public GameObject itemInstock;
+    public Transform sellPanel;
+    public Transform buyPanel;
+    public Transform inventoryPanel;
 
     private TMP_Text m_CoinText;
     private GameObject m_Store;
@@ -30,9 +32,10 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void Start()
     {
-        m_SellBtn.onClick.AddListener(ShowSellList);
-        m_BuyBtn.onClick.AddListener(ShowBuyList);
-        m_CloseBtn.onClick.AddListener(CloseMarket);
+        RegisterButtonEvent(m_SellBtn, ShowSellList);
+        RegisterButtonEvent(m_BuyBtn, ShowBuyList);
+        RegisterButtonEvent(m_CloseBtn, CloseMarket);
+        UpdateInventoryVisual(true);
     }
     public void UpdateCoin(int coin)
     {
@@ -45,19 +48,26 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void ShowSellList()
     {
+        if (buyPanel.gameObject.activeSelf)
+        {
+            buyPanel.gameObject.SetActive(false);
+        }
+        sellPanel.gameObject.SetActive(true);
+        m_SellBtn.enabled = false;
+        m_BuyBtn.enabled = true;
         List<InventorySystem.InventoryEntry> sellList = GameManager.Instance.Player.Inventory.GetSellableList();
-        bool enough = sellList.Count <= contentPanel.childCount;
+        bool enough = sellList.Count <= sellPanel.childCount;
         if (!enough)
         {
-            int diff= sellList.Count - contentPanel.childCount;
+            int diff= sellList.Count - sellPanel.childCount;
             for (int i = 0; i < diff; i++)
             {
-                Instantiate(itemPrefab, contentPanel);
+                Instantiate(itemForSell, sellPanel);
             }
         }
-        for(int i = 0; i < contentPanel.childCount; i++)
+        for(int i = 0; i < sellPanel.childCount; i++)
         {
-            GameObject newItem = contentPanel.GetChild(i).gameObject;
+            GameObject newItem = sellPanel.GetChild(i).gameObject;
             newItem.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -50, 0);
             if(i >= sellList.Count)
             {
@@ -74,12 +84,12 @@ public class GameUI : MonoBehaviour, IGameUI
             Item item = sellList[i].Item;
             int stack = sellList[i].StackSize;
 
-            Button buttonBuy = newItem.transform.Find("Sell").GetComponent<Button>();
-            buttonBuy.transform.Find("Price").GetComponent<TMP_Text>().text = item.SellPrice.ToString();
-            RegisterButtonEvent(buttonBuy, () => SellItem(item, 1));
-            Button buttonBuyAll = newItem.transform.Find("SellAll").GetComponent<Button>();
-            buttonBuyAll.transform.Find("Price").GetComponent<TMP_Text>().text = (item.SellPrice * stack).ToString();
-            RegisterButtonEvent(buttonBuyAll, () => SellItem(item, stack));
+            Button buttonSell = newItem.transform.Find("Sell").GetComponent<Button>();
+            buttonSell.transform.Find("Price").GetComponent<TMP_Text>().text = item.SellPrice.ToString();
+            RegisterButtonEvent(buttonSell, () => SellItem(item, 1));
+            Button buttonSellAll = newItem.transform.Find("SellAll").GetComponent<Button>();
+            buttonSellAll.transform.Find("Price").GetComponent<TMP_Text>().text = (item.SellPrice * stack).ToString();
+            RegisterButtonEvent(buttonSellAll, () => SellItem(item, stack));
         }
     }
     private void RegisterButtonEvent(Button btn, UnityAction func)
@@ -89,12 +99,92 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void SellItem(Item item, int count)
     {
-        GameManager.Instance.Player.Inventory.SellItem(item, count);
+        GameManager.Instance.Player.Inventory.OnSellItem(item, count);
         ShowSellList();
     }
     private void ShowBuyList()
     {
-        Debug.LogError("BuyPanel");
+        if (sellPanel.gameObject.activeSelf)
+        {
+            sellPanel.gameObject.SetActive(false);
+        }
+        buyPanel.gameObject.SetActive(true);
+        m_BuyBtn.enabled = false;
+        m_SellBtn.enabled = true;
+        List<ItemList.RowData> canBuyList = GameManager.Instance.ItemsToBuy();
+        bool enough = canBuyList.Count <= buyPanel.childCount;
+        if (!enough)
+        {
+            int diff = canBuyList.Count - buyPanel.childCount;
+            for (int i = 0; i < diff; i++)
+            {
+                Instantiate(itemInstock, buyPanel);
+            }
+        }
+        for (int i = 0; i < buyPanel.childCount; i++)
+        {
+            GameObject item = buyPanel.GetChild(i).gameObject;
+            item.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -50, 0);
+            if (i >= canBuyList.Count)
+            {
+                item.SetActive(false);
+                continue;
+            }
+            item.SetActive(true);
+            Vector3 pos = item.transform.GetComponent<RectTransform>().anchoredPosition;
+            item.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, pos.y + (-70 * i), 0);
+
+            Sprite iconSprite = Resources.Load<Sprite>(canBuyList[i].IconPath);
+            item.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
+            CropList.RowData good = GameManager.Instance.GetCropByID(canBuyList[i].CropID);
+            item.transform.Find("Data/HarvestNum").GetComponent<TMP_Text>().text = good.HarvestNum.ToString();
+            item.transform.Find("Data/GrowthTime").GetComponent<TMP_Text>().text = good.GrowthTime.ToString();
+
+            Item newItem = new Item(canBuyList[i].ItemID);
+            Button buttonBuy = item.transform.Find("Buy").GetComponent<Button>();
+            buttonBuy.transform.Find("Price").GetComponent<TMP_Text>().text = canBuyList[i].BuyPrice.ToString();
+            RegisterButtonEvent(buttonBuy, () => BuyItem(newItem, 1));
+
+        }
+    }
+    private void BuyItem(Item newItem, int count)
+    {
+        if(GameManager.Instance.Player.CanFitInInventory(newItem, count))
+        {
+            for(int i = 0; i < count; i++)
+            {
+                GameManager.Instance.Player.AddItem(newItem);
+            }
+        }
+    }
+    public void UpdateInventoryVisual(bool bForce = true)
+    {
+        InventorySystem.InventoryEntry[] inventoryList = GameManager.Instance.Player.Inventory.Entries;
+        for(int i = 0; i < inventoryList.Length; i++)
+        {
+            Transform slot = inventoryPanel.GetChild(i);
+            if (bForce)
+            {
+                InventorySystem.InventoryEntry entry = inventoryList[i];
+                Image icon = slot.Find("Icon").GetComponent<Image>();
+                TMP_Text countT = slot.Find("Num").GetComponent<TMP_Text>();
+                string text = string.Empty;
+                if (entry.Item != null)
+                {
+                    icon.sprite = Resources.Load<Sprite>(entry.Item.IconPath);
+                    if (entry.StackSize > 1)
+                    {
+                        text = entry.StackSize.ToString();
+                    }
+                }
+                else
+                {
+                    icon.gameObject.SetActive(false);
+                }
+                countT.text = text;
+            }
+            slot.Find("selected").gameObject.SetActive(i == GameManager.Instance.Player.Inventory.EquippedItemIdx);
+        }
     }
     private void CloseMarket()
     {

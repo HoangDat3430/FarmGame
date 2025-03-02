@@ -2,6 +2,7 @@
 {
     void UpdateCoin(int score);
     void ShowMarket();
+    void UpdateInventoryVisual(bool bForce);
     void ShowGameOver();
 }
 
@@ -18,11 +19,15 @@ public class UIHandler
     public void AddCoin(int amount)
     {
         score += amount;
-        _gameUI.UpdateCoin(score);  // Gọi UI thông qua Interface
+        _gameUI.UpdateCoin(score);
     }
     public void ShowMarket()
     {
         _gameUI.ShowMarket();
+    }
+    public void UpdateInventoryVisual(bool bForce)
+    {
+        _gameUI.UpdateInventoryVisual(bForce);
     }
     public void GameOver()
     {

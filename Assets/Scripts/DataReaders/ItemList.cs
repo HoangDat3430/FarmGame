@@ -11,7 +11,7 @@ public class ItemList : CSVReader
         public int SellPrice;
         public string PrefabPath;
         public string IconPath;
-        public int StackSize;
+        public int MaxStackSize;
         public int CropID;
         public bool Consumable;
         public string Animator;
@@ -26,7 +26,7 @@ public class ItemList : CSVReader
         Table[line].SellPrice = int.Parse(data[3]);
         Table[line].PrefabPath = data[4];
         Table[line].IconPath = data[5];
-        Table[line].StackSize = int.Parse(data[6]);
+        Table[line].MaxStackSize = int.Parse(data[6]);
         Table[line].CropID = int.Parse(data[7]);
         Table[line].Consumable = data[8] == "0" ? false : true;
         Table[line].Animator = data[9];

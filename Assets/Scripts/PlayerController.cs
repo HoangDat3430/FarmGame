@@ -80,8 +80,9 @@ namespace Farm
             
             GameManager.Instance.Player = this;
             DontDestroyOnLoad(gameObject);
+            m_Inventory.Init();
         }
-        
+
         void Start()
         {
             //Retrieve the action from the InputAction asset, enable them and add the callbacks.
@@ -116,8 +117,6 @@ namespace Farm
             
             m_CurrentLookDirection = Vector2.right;
             
-            m_Inventory.Init();
-
             foreach (var entry in m_Inventory.Entries)
             {
                 if (entry.Item != null)

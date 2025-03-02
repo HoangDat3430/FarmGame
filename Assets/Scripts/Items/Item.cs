@@ -28,7 +28,7 @@ namespace Farm
             BuyPrice = rowData.BuyPrice;
             PrefabPath = rowData.PrefabPath;
             IconPath = rowData.IconPath;
-            MaxStackSize = rowData.StackSize;
+            MaxStackSize = rowData.MaxStackSize;
             CropID = rowData.CropID;
             Consumable = rowData.Consumable;
             PlayerAnimatorTriggerUse = rowData.Animator;
