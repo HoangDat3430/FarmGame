@@ -8,3 +8,5 @@ ItemID,Item Name,Buy Price,Sell Price,Prefab,Icon,Max Stack Size,CropID,Comsumab
 7,Seed (Carrot),30,-1,Prefabs/Carrot/Carrot_Seed_Visual,Sprites/Carrot/Sprite_Carrot_seedbag,100,1,1,Planting,0
 8,Seed (Corn),50,-1,Prefabs/Corn/Corn_Seed_Visual,Sprites/Corn/Sprite_Corn_seedbag,100,2,1,Planting,0
 9,Seed (Wheat),40,-1,Prefabs/Wheat/Wheat_Seed_Visual,Sprites/Wheat/Sprite_Wheat_seedbag,100,3,1,Planting,1
+10,Cow,100,-1,Prefabs/Prefab_Cow,Sprites/Cow/cow_icon,5,4,1,Planting,0
+11,Milk,-1,15,Prefabs/Milk,Sprites/Cow/milk_icon,100,-1,0,,0

@@ -46,10 +46,14 @@ namespace Farm
             Entries[3].StackSize = 10;
             Entries[4].Item = new WheatSeedBag();
             Entries[4].StackSize = 10;
+            Entries[5].Item = new Cow();
+            Entries[5].StackSize = 1;
             Entries[6].Item = new Product(5);
             Entries[6].StackSize = 10;
             Entries[7].Item = new Product(6);
             Entries[7].StackSize = 10;
+            Entries[8].Item = new Product(11);
+            Entries[8].StackSize = 10;
             EquippedItemIdx = 0;
         }
 
@@ -70,12 +74,8 @@ namespace Farm
                     if (Entries[EquippedItemIdx].StackSize == 0)
                     {
                         Entries[EquippedItemIdx].Item = null;
-                        GameManager.Instance.UpdateInventoryVisual(true);
                     }
-                    else
-                    {
-                        GameManager.Instance.UpdateInventoryVisual(false);
-                    }
+                    GameManager.Instance.UpdateInventoryVisual(true);
                 }
             }
 
@@ -89,7 +89,7 @@ namespace Farm
 
             for (int i = 0; i < InventorySize; ++i)
             {
-                if (Entries[i].Item == newItem)
+                if (Entries[i].Item?.ItemID == newItem.ItemID)
                 {
                     int size = newItem.MaxStackSize - Entries[i].StackSize;
                     toFit -= size;
@@ -124,7 +124,10 @@ namespace Farm
                     Entries[i].StackSize += fit;
                     remainingToFit -= fit;
                     if (remainingToFit == 0)
+                    {
+                        GameManager.Instance.UpdateInventoryVisual(true);
                         return true;
+                    }
                 }
             }
 
@@ -137,12 +140,13 @@ namespace Farm
                     int fit = Mathf.Min(newItem.MaxStackSize - Entries[i].StackSize, remainingToFit);
                     remainingToFit -= fit;
                     Entries[i].StackSize = fit;
-
                     if (remainingToFit == 0)
+                    {
+                        GameManager.Instance.UpdateInventoryVisual(true);
                         return true;
+                    }
                 }
             }
-
             //we couldn't had so no space left
             return remainingToFit == 0;
         }
@@ -178,7 +182,7 @@ namespace Farm
                 if (entry.Item != null && entry.Item == item)
                 {
                     entry.StackSize -= count;
-                    GameManager.Instance.AddCoin(item.SellPrice);
+                    GameManager.Instance.AddCoin(item.SellPrice * count);
                     if(entry.StackSize == 0)
                     {
                         entry.Item = null;

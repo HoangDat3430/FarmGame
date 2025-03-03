@@ -166,11 +166,11 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void BuyItem(Item newItem, int count)
     {
-        if(GameManager.Instance.Player.CanFitInInventory(newItem, count))
+        if(GameManager.Instance.Player.CanFitInInventory(newItem, count) && GameManager.Instance.Coin >= newItem.BuyPrice * count)
         {
             for(int i = 0; i < count; i++)
             {
-                if (GameManager.Instance.Coin >= newItem.BuyPrice && GameManager.Instance.Player.AddItem(newItem))
+                if (GameManager.Instance.Player.AddItem(newItem))
                 {
                     GameManager.Instance.AddCoin(-newItem.BuyPrice);
                 }
