@@ -88,7 +88,21 @@ namespace Farm
         private Dictionary<Vector3Int, CropData> m_CropData = new();
 
         private Dictionary<int, List<Vector3Int>> fieldGroups = new Dictionary<int, List<Vector3Int>>();
-
+        private int unlockedFields = 0;
+        public Dictionary<int, List<Vector3Int>> FieldGroups
+        {
+            get
+            {
+                return fieldGroups;
+            }
+        }
+        public int UnlockedFields
+        {
+            get
+            {
+                return unlockedFields;
+            }
+        }
         void Awake()
         {
             GameManager.Instance.Terrain = this;
@@ -159,6 +173,10 @@ namespace Farm
             }
 
             return fieldTiles;
+        }
+        public void UnlockFields(int amount)
+        {
+            unlockedFields += amount;
         }
         public List<Vector3Int> GetFieldByTile(Vector3Int target)
         {

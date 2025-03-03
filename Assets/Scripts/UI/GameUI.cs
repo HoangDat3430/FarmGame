@@ -21,6 +21,7 @@ public class GameUI : MonoBehaviour, IGameUI
     private Button m_SellBtn;
     private Button m_BuyBtn;
     private Button m_CloseBtn;
+    private Button m_FarmLandsBtn;
 
     private void Awake()
     {
@@ -29,12 +30,14 @@ public class GameUI : MonoBehaviour, IGameUI
         m_SellBtn = m_Store.transform.Find("SellBtn").GetComponent<Button>();
         m_BuyBtn = m_Store.transform.Find("BuyBtn").GetComponent<Button>();
         m_CloseBtn = m_Store.transform.Find("CloseBtn").GetComponent<Button>();
+        m_FarmLandsBtn = transform.Find("FarmLands").GetComponent<Button>();
     }
     private void Start()
     {
         RegisterButtonEvent(m_SellBtn, ShowSellList);
         RegisterButtonEvent(m_BuyBtn, ShowBuyList);
         RegisterButtonEvent(m_CloseBtn, CloseMarket);
+        RegisterButtonEvent(m_FarmLandsBtn, ShowLandList);
         UpdateInventoryVisual(true);
     }
     public void UpdateCoin(int coin)
@@ -152,7 +155,6 @@ public class GameUI : MonoBehaviour, IGameUI
             Button buttonBuyTen = item.transform.Find("Buy10").GetComponent<Button>();
             buttonBuyTen.transform.Find("Price").GetComponent<TMP_Text>().text = (canBuyList[i].BuyPrice * 10).ToString();
             RegisterButtonEvent(buttonBuyTen, () => BuyItem(newItem, 10));
-
         }
     }
     private void BuyItem(Item newItem, int count)
@@ -198,6 +200,23 @@ public class GameUI : MonoBehaviour, IGameUI
     private void CloseMarket()
     {
         m_Store.SetActive(false);
+    }
+    private void ShowLandList()
+    {
+        int unlockedLands = GameManager.Instance.Terrain.UnlockedFields;
+        var Lands = GameManager.Instance.Terrain.FieldGroups;
+        for(int i = 1; i <= Lands.Count; i++)
+        {
+            if (i <= unlockedLands)
+            {
+                Debug.LogError($"Land {i} is unlocked!");
+            }
+            else
+            {
+                Debug.LogError($"Land {i} is locked!");
+            }
+        }
+
     }
     public void ShowGameOver()
     {

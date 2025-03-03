@@ -100,6 +100,7 @@ namespace Farm
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
             uiLogic = new UIHandler(gameUI);
             AddCoin(500);
+            Terrain.UnlockFields(3);
         }
 
 #if UNITY_EDITOR
