@@ -16,6 +16,7 @@ public class ItemList : CSVReader
         public bool Consumable;
         public string Animator;
         public bool WholeSale;
+        public int Type;
     }
     public RowData[] Table = null;
     public override void InitRowData(int line, string[] data)
@@ -32,6 +33,7 @@ public class ItemList : CSVReader
         Table[line].Consumable = data[8] == "0" ? false : true;
         Table[line].Animator = data[9];
         Table[line].WholeSale = data[10] == "0" ? false : true;
+        Table[line].Type = int.Parse(data[11]);
         itemDic[Table[line].ItemID] = Table[line];
     }
     public override void OnClear(int lineCount)

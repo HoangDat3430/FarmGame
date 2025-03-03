@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 using UnityEngine.VFX;
 using static UnityEditor.PlayerSettings;
+using static UnityEngine.Rendering.DebugUI;
 
 
 namespace Farm
@@ -228,9 +229,11 @@ namespace Farm
             return GroundTilemap.GetTile(target) == TilleableTile;
         }
 
-        public bool IsPlantable(Vector3Int target)
+        public bool IsPlantable(Vector3Int target, Crop crop)
         {
-            return IsTilled(target) && !m_CropData.ContainsKey(target);
+            Crop cropInField = GameManager.Instance.Terrain.GetCropDataByPosition(target)?.GrowingCrop;
+            //Debug.LogError(IsTilled(target) + " " + !m_CropData.ContainsKey(target) + " " + (cropInField == null || cropInField.CropID == crop.CropID));
+            return IsTilled(target) && !m_CropData.ContainsKey(target) && (cropInField == null || cropInField.CropID == crop.CropID);
         }
 
         public bool IsTilled(Vector3Int target)
@@ -257,7 +260,6 @@ namespace Farm
             cropData.CurrentGrowthStage = 0;
 
             m_CropData.Add(target, cropData);
-
             UpdateCropVisual(target);
 
         }
@@ -359,13 +361,24 @@ namespace Farm
                 CropTilemap.SetTile(target, data.GrowingCrop.GrowthStagesTiles[data.CurrentGrowthStage]);
             }
         }
-        public CropData GetCropDataInField(int fieldID)
+        public CropData GetCropDataByFieldID(int fieldID)
         {
             foreach (var cell in fieldGroups[fieldID])
             {
                 if (m_CropData.ContainsKey(cell))
                 {
                     return m_CropData[cell];
+                }
+            }
+            return null;
+        }
+        public CropData GetCropDataByPosition(Vector3Int pos)
+        {
+            foreach (var field in fieldGroups)
+            {
+                if (field.Value.Contains(pos))
+                {
+                    return GetCropDataByFieldID(field.Key);
                 }
             }
             return null;

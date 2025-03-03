@@ -2,6 +2,13 @@ using UnityEngine;
 
 namespace Farm
 {
+    public enum ItemType
+    {
+        None,
+        Tool,
+        SeedBag,
+        Animal
+    }
     public class Item
     {
         public int Key => ItemID;
@@ -18,6 +25,9 @@ namespace Farm
         public bool Consumable;
         public string PlayerAnimatorTriggerUse;
         public bool WholeSale;
+        public ItemType Type;
+
+        public Crop Crop;
 
         public Item(int itemID)
         {
@@ -34,6 +44,8 @@ namespace Farm
             Consumable = rowData.Consumable;
             PlayerAnimatorTriggerUse = rowData.Animator;
             WholeSale = rowData.WholeSale;
+            Type = (ItemType)rowData.Type;
+            Crop = CropID != -1 ? new Crop(CropID) : null;
         }
 
         public virtual bool CanUse(Vector3Int target)

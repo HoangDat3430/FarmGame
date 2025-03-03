@@ -42,11 +42,11 @@ namespace Farm
             Entries[1].StackSize = 1;
             Entries[2].Item = new WaterCan();
             Entries[2].StackSize = 1;
-            Entries[3].Item = new CornSeedBag();
-            Entries[3].StackSize = 10;
-            Entries[4].Item = new WheatSeedBag();
+            //Entries[3].Item = new CornSeedBag();
+            //Entries[3].StackSize = 10;
+            Entries[4].Item = new SeedBag(9);
             Entries[4].StackSize = 10;
-            Entries[5].Item = new Cow();
+            Entries[5].Item = new Animal(10);
             Entries[5].StackSize = 1;
             Entries[6].Item = new Product(5);
             Entries[6].StackSize = 10;
