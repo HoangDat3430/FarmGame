@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEditorInternal.Profiling.Memory.Experimental;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -113,8 +115,9 @@ namespace Farm
         }
         public bool AddItem(Item newItem, int amount = 1)
         {
+            SpecifyItem(ref newItem);
             int remainingToFit = amount;
-
+            
             //first we check if there is already that item in the inventory
             for (int i = 0; i < InventorySize; ++i)
             {
@@ -188,6 +191,20 @@ namespace Farm
                         entry.Item = null;
                     }
                 }
+            }
+        }
+        private void SpecifyItem(ref Item item)
+        {
+            switch (item.Type)
+            {
+                case ItemType.SeedBag:
+                    item = new SeedBag(item.ItemID);
+                    break;
+                case ItemType.Animal:
+                    item = new Animal(item.ItemID);
+                    break;
+                default:
+                    break;
             }
         }
     }

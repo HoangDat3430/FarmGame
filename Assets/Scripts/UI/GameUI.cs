@@ -151,19 +151,7 @@ public class GameUI : MonoBehaviour, IGameUI
             item.transform.Find("Data/HarvestNum/Count").GetComponent<TMP_Text>().text = good.HarvestNum.ToString();
             item.transform.Find("Data/GrowthTime/Count").GetComponent<TMP_Text>().text = good.GrowthTime.ToString();
 
-            Item newItem;
-            switch ((ItemType)canBuyList[i].Type)
-            {
-                case ItemType.SeedBag:
-                    newItem = new SeedBag(canBuyList[i].ItemID);
-                    break;
-                case ItemType.Animal:
-                    newItem = new Animal(canBuyList[i].ItemID);
-                    break;
-                default:
-                    newItem = new Item(canBuyList[i].ItemID);
-                    break;
-            }
+            Item newItem = new Item(canBuyList[i].ItemID);
             Button buttonBuy = item.transform.Find("Buy").GetComponent<Button>();
             buttonBuy.gameObject.SetActive(!newItem.WholeSale);
             if (!newItem.WholeSale)
