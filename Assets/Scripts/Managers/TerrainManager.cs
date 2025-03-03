@@ -75,6 +75,7 @@ namespace Farm
 
         public Tilemap GroundTilemap;
         public Tilemap CropTilemap;
+        public GameObject Lock;
 
         [Header("Watering")]
         public Tilemap WaterTilemap;
@@ -88,7 +89,8 @@ namespace Farm
         private Dictionary<Vector3Int, CropData> m_CropData = new();
 
         private Dictionary<int, List<Vector3Int>> fieldGroups = new Dictionary<int, List<Vector3Int>>();
-        private int unlockedFields = 0;
+        private Dictionary<int, GameObject> remainingLock = new Dictionary<int, GameObject>();
+
         public Dictionary<int, List<Vector3Int>> FieldGroups
         {
             get
@@ -96,17 +98,18 @@ namespace Farm
                 return fieldGroups;
             }
         }
-        public int UnlockedFields
+        public Dictionary<int, GameObject> RemaningLock
         {
             get
             {
-                return unlockedFields;
+                return remainingLock;
             }
         }
         void Awake()
         {
             GameManager.Instance.Terrain = this;
             GroupTilesByFields();
+            InitFarmLands();
         }
 
         void GroupTilesByFields()
@@ -176,7 +179,28 @@ namespace Farm
         }
         public void UnlockFields(int amount)
         {
-            unlockedFields += amount;
+            for (int i = 1; i < remainingLock.Count; i++)
+            {
+                if (remainingLock.ContainsKey(i))
+                {
+                    Destroy(remainingLock[i]);
+                    remainingLock.Remove(i);
+                    amount--;
+                }
+                if (amount == 0) return;
+            }
+        }
+        private void InitFarmLands()
+        {
+            for (int i = 1; i <= fieldGroups.Count; i++)
+            {
+                var field = fieldGroups[i];// Get the field by ID
+                remainingLock[i] = Instantiate(Lock, field[3], Quaternion.identity);
+            }
+        }
+        public Vector3Int GetCenter(List<Vector3Int> tile)
+        {
+            return Vector3Int.zero;
         }
         public List<Vector3Int> GetFieldByTile(Vector3Int target)
         {
@@ -191,6 +215,16 @@ namespace Farm
         }
         public bool IsTillable(Vector3Int target)
         {
+            foreach (var field in fieldGroups)
+            {
+                if (field.Value.Contains(target))
+                {
+                    if (remainingLock.ContainsKey(field.Key))
+                    {
+                        return false;
+                    }
+                }
+            }
             return GroundTilemap.GetTile(target) == TilleableTile;
         }
 
@@ -324,6 +358,17 @@ namespace Farm
             {
                 CropTilemap.SetTile(target, data.GrowingCrop.GrowthStagesTiles[data.CurrentGrowthStage]);
             }
+        }
+        public CropData GetCropDataInField(int fieldID)
+        {
+            foreach (var cell in fieldGroups[fieldID])
+            {
+                if (m_CropData.ContainsKey(cell))
+                {
+                    return m_CropData[cell];
+                }
+            }
+            return null;
         }
     }
 }

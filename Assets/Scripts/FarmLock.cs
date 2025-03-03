@@ -9,8 +9,8 @@ public class FarmLock : InteractiveObject
     {
         if(GameManager.Instance.Coin >= 500)
         {
+            GameManager.Instance.Terrain.UnlockFields(1);
             GameManager.Instance.AddCoin(-500);
-            Destroy(gameObject);
         }
     }
 }

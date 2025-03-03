@@ -10,34 +10,41 @@ public class GameUI : MonoBehaviour, IGameUI
 {
     public GameObject itemForSell;
     public GameObject itemInstock;
+    public GameObject farmTpl;
     public Transform sellPanel;
     public Transform buyPanel;
     public Transform inventoryPanel;
+    public Transform farmPanel;
 
     private TMP_Text m_CoinText;
     private GameObject m_Store;
+    private GameObject m_FarmList;
     private GameObject m_GameOverPanel;
 
     private Button m_SellBtn;
     private Button m_BuyBtn;
-    private Button m_CloseBtn;
-    private Button m_FarmLandsBtn;
+    private Button m_CloseStoreBtn;
+    private Button m_ExpandFarmBtn;
+    private Button m_CloseFarmListBtn;
 
     private void Awake()
     {
         m_CoinText = transform.Find("Coin").GetComponent<TMP_Text>();
         m_Store = transform.Find("Store").gameObject;
+        m_FarmList = transform.Find("FarmList").gameObject;
         m_SellBtn = m_Store.transform.Find("SellBtn").GetComponent<Button>();
         m_BuyBtn = m_Store.transform.Find("BuyBtn").GetComponent<Button>();
-        m_CloseBtn = m_Store.transform.Find("CloseBtn").GetComponent<Button>();
-        m_FarmLandsBtn = transform.Find("FarmLands").GetComponent<Button>();
+        m_CloseStoreBtn = m_Store.transform.Find("CloseBtn").GetComponent<Button>();
+        m_ExpandFarmBtn = transform.Find("ExpandFarm").GetComponent<Button>();
+        m_CloseFarmListBtn = transform.Find("FarmList/CloseBtn").GetComponent<Button>();
     }
     private void Start()
     {
         RegisterButtonEvent(m_SellBtn, ShowSellList);
         RegisterButtonEvent(m_BuyBtn, ShowBuyList);
-        RegisterButtonEvent(m_CloseBtn, CloseMarket);
-        RegisterButtonEvent(m_FarmLandsBtn, ShowLandList);
+        RegisterButtonEvent(m_CloseStoreBtn, CloseMarket);
+        RegisterButtonEvent(m_ExpandFarmBtn, ShowLandList);
+        RegisterButtonEvent(m_CloseFarmListBtn, CloseLandList);
         UpdateInventoryVisual(true);
     }
     public void UpdateCoin(int coin)
@@ -203,20 +210,49 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void ShowLandList()
     {
-        int unlockedLands = GameManager.Instance.Terrain.UnlockedFields;
-        var Lands = GameManager.Instance.Terrain.FieldGroups;
-        for(int i = 1; i <= Lands.Count; i++)
+        m_FarmList.SetActive(true);
+        var farmList = GameManager.Instance.Terrain.FieldGroups;
+        var lockedFarms = GameManager.Instance.Terrain.RemaningLock;
+        bool enough = farmList.Count <= farmPanel.childCount;
+        if (!enough)
         {
-            if (i <= unlockedLands)
+            int diff = farmList.Count - farmPanel.childCount;
+            for (int i = 0; i < diff; i++)
             {
-                Debug.LogError($"Land {i} is unlocked!");
+                Instantiate(farmTpl, farmPanel);
+            }
+        }
+        for (int i = 1; i <= farmList.Count; i++)
+        {
+            GameObject farm = farmPanel.GetChild(i-1).gameObject;
+            Image icon = farm.transform.Find("Icon").GetComponent<Image>();
+            TMP_Text leftTime = farm.transform.Find("Time/remaning").GetComponent<TMP_Text>();
+            if (lockedFarms.ContainsKey(i))
+            {
+                icon.sprite = Resources.Load<Sprite>("Sprites/UI/Lock");
+                leftTime.transform.parent.gameObject.SetActive(false);
             }
             else
             {
-                Debug.LogError($"Land {i} is locked!");
+                TerrainManager.CropData cropData = GameManager.Instance.Terrain.GetCropDataInField(i);
+                if(cropData != null)
+                {
+                    icon.sprite = Resources.Load<Sprite>(cropData.GrowingCrop.Product.IconPath);
+                    leftTime.transform.parent.gameObject.SetActive(true);
+                    int time = (int)(cropData.GrowingCrop.GrowthTime - cropData.GrowthTimer);
+                    leftTime.text = time.ToString();
+                }
+                else
+                {
+                    icon.sprite = null;
+                    leftTime.transform.parent.gameObject.SetActive(false);
+                }
             }
         }
-
+    }
+    private void CloseLandList()
+    {
+        m_FarmList.SetActive(false);
     }
     public void ShowGameOver()
     {
