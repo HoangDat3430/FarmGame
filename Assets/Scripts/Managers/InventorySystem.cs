@@ -70,6 +70,11 @@ namespace Farm
                     if (Entries[EquippedItemIdx].StackSize == 0)
                     {
                         Entries[EquippedItemIdx].Item = null;
+                        GameManager.Instance.UpdateInventoryVisual(true);
+                    }
+                    else
+                    {
+                        GameManager.Instance.UpdateInventoryVisual(false);
                     }
                 }
             }

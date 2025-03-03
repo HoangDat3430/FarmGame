@@ -208,7 +208,7 @@ public class GameUI : MonoBehaviour, IGameUI
     {
         m_Store.SetActive(false);
     }
-    private void ShowLandList()
+    public void ShowLandList()
     {
         m_FarmList.SetActive(true);
         var farmList = GameManager.Instance.Terrain.FieldGroups;
@@ -226,11 +226,15 @@ public class GameUI : MonoBehaviour, IGameUI
         {
             GameObject farm = farmPanel.GetChild(i-1).gameObject;
             Image icon = farm.transform.Find("Icon").GetComponent<Image>();
+            Button buyFarm = icon.GetComponent<Button>();
             TMP_Text leftTime = farm.transform.Find("Time/remaning").GetComponent<TMP_Text>();
+            buyFarm.enabled = false;
             if (lockedFarms.ContainsKey(i))
             {
                 icon.sprite = Resources.Load<Sprite>("Sprites/UI/Lock");
                 leftTime.transform.parent.gameObject.SetActive(false);
+                buyFarm.enabled = true;
+                RegisterButtonEvent(buyFarm, () => BuyFarm());
             }
             else
             {
@@ -249,6 +253,16 @@ public class GameUI : MonoBehaviour, IGameUI
                 }
             }
         }
+    }
+    private void BuyFarm()
+    {
+        if(GameManager.Instance.Coin < 500)
+        {
+            return;
+        }
+        GameManager.Instance.AddCoin(-500);
+        GameManager.Instance.Terrain.UnlockFields(1);
+        ShowLandList();
     }
     private void CloseLandList()
     {

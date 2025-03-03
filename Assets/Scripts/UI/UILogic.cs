@@ -3,6 +3,7 @@
     void UpdateCoin(int score);
     void ShowMarket();
     void UpdateInventoryVisual(bool bForce);
+    void ShowLandList();
     void ShowGameOver();
 }
 
@@ -24,6 +25,10 @@ public class UIHandler
     public void ShowMarket()
     {
         _gameUI.ShowMarket();
+    }
+    public void ShowLandList()
+    {
+        _gameUI.ShowLandList();
     }
     public void UpdateInventoryVisual(bool bForce)
     {

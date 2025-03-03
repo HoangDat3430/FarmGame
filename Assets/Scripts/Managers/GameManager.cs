@@ -164,6 +164,10 @@ namespace Farm
             m_Coin += amount;
             uiLogic.AddCoin(amount);
         }
+        public void OpenFarmStore()
+        {
+            uiLogic.ShowLandList();
+        }
         public void UpdateInventoryVisual(bool bForce)
         {
             uiLogic.UpdateInventoryVisual(bForce);
