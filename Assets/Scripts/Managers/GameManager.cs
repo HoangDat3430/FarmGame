@@ -40,10 +40,10 @@ namespace Farm
                 return s_Instance;
             }
         }
-        public TerrainManager Terrain { get; set; }
+        public TerrainManager TerrainMgr { get; set; }
+        public WorkerManager WorkerMgr { get; set; }
         public PlayerController Player { get; set; }
         public DayCycleHandler DayCycleHandler { get; set; }
-        public Tilemap WalkSurfaceTilemap { get; set; }
         
         // Will return the ratio of time for the current day between 0 (00:00) and 1 (23:59).
         public float CurrentDayRatio => m_CurrentTimeOfTheDay / DayDurationInSeconds;
@@ -100,7 +100,7 @@ namespace Farm
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
             uiLogic = new UIHandler(gameUI);
             AddCoin(5000);
-            Terrain.UnlockFields(3);
+            TerrainMgr.UnlockFields(3);
         }
 
 #if UNITY_EDITOR
@@ -171,6 +171,10 @@ namespace Farm
         public void UpdateInventoryVisual(bool bForce)
         {
             uiLogic.UpdateInventoryVisual(bForce);
+        }
+        public void UpdateIdleWorkers()
+        {
+            uiLogic.UpdateIdleWorkers();
         }
         public ItemList.RowData GetItemByItemID(int itemId)
         {

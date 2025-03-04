@@ -9,18 +9,18 @@ namespace Farm
         }
         public override bool CanUse(Vector3Int target)
         {
-            var data = GameManager.Instance.Terrain.GetCropDataAt(target);
+            var data = GameManager.Instance.TerrainMgr.GetCropDataAt(target);
             return data != null && data.GrowingCrop != null && Mathf.Approximately(data.GrowthRatio, 1.0f);
         }
 
         public override bool Use(Vector3Int target)
         {
-            var data = GameManager.Instance.Terrain.GetCropDataAt(target);
+            var data = GameManager.Instance.TerrainMgr.GetCropDataAt(target);
             if (!GameManager.Instance.Player.CanFitInInventory(data.GrowingCrop.Product,
                     data.GrowingCrop.ProductPerHarvest))
                 return false;
             
-            var product = GameManager.Instance.Terrain.HarvestAt(target);
+            var product = GameManager.Instance.TerrainMgr.HarvestAt(target);
 
             if (product != null)
             {

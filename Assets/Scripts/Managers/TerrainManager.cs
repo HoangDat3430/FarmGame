@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.UI;
 using UnityEngine.Tilemaps;
@@ -98,33 +99,35 @@ namespace Farm
         private Dictionary<Vector3Int, GroundData> m_GroundData = new();
         private Dictionary<Vector3Int, CropData> m_CropData = new();
 
-        private Dictionary<int, List<Vector3Int>> fieldGroups = new Dictionary<int, List<Vector3Int>>();
-        private Dictionary<int, GameObject> remainingLock = new Dictionary<int, GameObject>();
+        private Dictionary<int, List<Vector3Int>> m_FieldGroups = new Dictionary<int, List<Vector3Int>>();
+        private Dictionary<int, GameObject> m_RemainingLock = new Dictionary<int, GameObject>();
+        private List<int> m_WaitingToHarvestFields = new List<int>();
 
         public Dictionary<int, List<Vector3Int>> FieldGroups
         {
             get
             {
-                return fieldGroups;
+                return m_FieldGroups;
             }
         }
         public Dictionary<int, GameObject> RemaningLock
         {
             get
             {
-                return remainingLock;
+                return m_RemainingLock;
             }
         }
         void Awake()
         {
-            GameManager.Instance.Terrain = this;
+            GameManager.Instance.TerrainMgr = this;
+            transform.Find("Warehouse").AddComponent<WorkerManager>();
             GroupTilesByFields();
             InitFarmLands();
         }
 
         void GroupTilesByFields()
         {
-            fieldGroups.Clear();
+            m_FieldGroups.Clear();
 
             BoundsInt bounds = GroundTilemap.cellBounds;
             Dictionary<Vector3Int, int> visited = new Dictionary<Vector3Int, int>(); // Track visited tiles
@@ -144,7 +147,7 @@ namespace Farm
 
                         if (fieldTiles.Count > 0)
                         {
-                            fieldGroups[fieldID] = fieldTiles;
+                            m_FieldGroups[fieldID] = fieldTiles;
                             fieldID++; // Increment field ID for the next group
                         }
                     }
@@ -189,12 +192,12 @@ namespace Farm
         }
         public void UnlockFields(int amount)
         {
-            for (int i = 1; i <= fieldGroups.Count; i++)
+            for (int i = 1; i <= m_FieldGroups.Count; i++)
             {
-                if (remainingLock.ContainsKey(i))
+                if (m_RemainingLock.ContainsKey(i))
                 {
-                    Destroy(remainingLock[i]);
-                    remainingLock.Remove(i);
+                    Destroy(m_RemainingLock[i]);
+                    m_RemainingLock.Remove(i);
                     amount--;
                     if (amount == 0) return;
                 }
@@ -202,34 +205,41 @@ namespace Farm
         }
         private void InitFarmLands()
         {
-            for (int i = 1; i <= fieldGroups.Count; i++)
+            for (int i = 1; i <= m_FieldGroups.Count; i++)
             {
-                var field = fieldGroups[i];// Get the field by ID
-                remainingLock[i] = Instantiate(Lock, field[3], Quaternion.identity);
+                var field = m_FieldGroups[i];
+                m_RemainingLock[i] = Instantiate(Lock, field[3], Quaternion.identity);
             }
-        }
-        public Vector3Int GetCenter(List<Vector3Int> tile)
-        {
-            return Vector3Int.zero;
         }
         public List<Vector3Int> GetFieldByTile(Vector3Int target)
         {
-            foreach (var field in fieldGroups)
+            foreach (var field in m_FieldGroups)
             {
-                if (field.Value.Contains(target))  // Check if the position exists in the field
+                if (field.Value.Contains(target))
                 {
                     return field.Value;
                 }
             }
             return null;
         }
+        public int GetFieldIdByTile(Vector3Int target)
+        {
+            foreach (var field in m_FieldGroups)
+            {
+                if (field.Value.Contains(target))  
+                {
+                    return field.Key;
+                }
+            }
+            return -1;
+        }
         public bool IsTillable(Vector3Int target)
         {
-            foreach (var field in fieldGroups)
+            foreach (var field in m_FieldGroups)
             {
                 if (field.Value.Contains(target))
                 {
-                    if (remainingLock.ContainsKey(field.Key))
+                    if (m_RemainingLock.ContainsKey(field.Key))
                     {
                         return false;
                     }
@@ -240,12 +250,12 @@ namespace Farm
 
         public bool IsPlantable(Vector3Int target, Crop crop)
         {
-            Crop cropInField = GameManager.Instance.Terrain.GetCropDataByPosition(target)?.GrowingCrop;
+            Crop cropInField = GameManager.Instance.TerrainMgr.GetCropDataByPosition(target)?.GrowingCrop;
             return IsTilled(target) && !m_CropData.ContainsKey(target) && (cropInField == null || cropInField.CropID == crop.CropID);
         }
         public bool IsGrazable(Vector3Int target, Crop crop)
         {
-            Crop cropInField = GameManager.Instance.Terrain.GetCropDataByPosition(target)?.GrowingCrop;
+            Crop cropInField = GameManager.Instance.TerrainMgr.GetCropDataByPosition(target)?.GrowingCrop;
             return (IsTillable(target) || IsTilled(target)) && !m_CropData.ContainsKey(target) && cropInField == null;
         }
         public bool IsTilled(Vector3Int target)
@@ -286,7 +296,7 @@ namespace Farm
                 cropData.GrowthTimer = 0.0f;
                 cropData.CurrentGrowthStage = 0;
 
-                if (i==0)
+                if (i==0)//Graze only 1 animal in a field, cells have the same crop data with each other.
                 {
                     ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cattleToGraze.CropID);
                     GameObject animalPrefab = Resources.Load<GameObject>(rowData.PrefabPath);
@@ -402,7 +412,7 @@ namespace Farm
         }
         public CropData GetCropDataByFieldID(int fieldID)
         {
-            foreach (var cell in fieldGroups[fieldID])
+            foreach (var cell in m_FieldGroups[fieldID])
             {
                 if (m_CropData.ContainsKey(cell))
                 {
@@ -413,7 +423,7 @@ namespace Farm
         }
         public CropData GetCropDataByPosition(Vector3Int pos)
         {
-            foreach (var field in fieldGroups)
+            foreach (var field in m_FieldGroups)
             {
                 if (field.Value.Contains(pos))
                 {
@@ -421,6 +431,30 @@ namespace Farm
                 }
             }
             return null;
+        }
+        public int GetHarvestableField()
+        {
+            foreach (var field in m_FieldGroups)
+            {
+                if (!m_RemainingLock.ContainsKey(field.Key) && !m_WaitingToHarvestFields.Contains(field.Key))
+                {
+                    CropData cropData = GetCropDataByFieldID(field.Key);
+                    if(cropData != null && Mathf.Approximately(cropData.GrowthRatio, 1.0f))
+                    {
+                        return field.Key;
+                    }
+                }
+            }
+            return -1;
+        }
+        public Vector3Int AddWaitingToHarvestField(int fieldId)
+        {
+            m_WaitingToHarvestFields.Add(fieldId);
+            return m_FieldGroups[fieldId][4];
+        }
+        public void OnWorkerHavestDone(int fieldId)
+        {
+            m_WaitingToHarvestFields.Remove(fieldId);
         }
     }
 }

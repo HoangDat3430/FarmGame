@@ -146,7 +146,7 @@ namespace Farm
             
             //If we reached here, we are not above UI or an interactive object, so set the cursor to the normal one
 
-            var grid = GameManager.Instance.Terrain?.Grid;
+            var grid = GameManager.Instance.TerrainMgr?.Grid;
 
             //some scene may not have a terrain (interior scene)
             if (grid != null)
@@ -171,7 +171,7 @@ namespace Farm
 
 
                 m_CurrentTarget = currentCell + toTarget;
-                Target.transform.position = GameManager.Instance.Terrain.Grid.GetCellCenterWorld(m_CurrentTarget);
+                Target.transform.position = GameManager.Instance.TerrainMgr.Grid.GetCellCenterWorld(m_CurrentTarget);
 
                 if (m_Inventory.EquippedItem != null
                     && m_Inventory.EquippedItem.CanUse(m_CurrentTarget))
@@ -196,7 +196,7 @@ namespace Farm
             
             if (m_Inventory.EquippedItem != null && m_Inventory.EquippedItem.NeedTarget() && !m_HasTarget) return;
             
-            List<Vector3Int> tiles = GameManager.Instance.Terrain.GetFieldByTile(m_CurrentTarget);
+            List<Vector3Int> tiles = GameManager.Instance.TerrainMgr.GetFieldByTile(m_CurrentTarget);
             if(tiles != null)
             {
                 for (int i = 0; i < tiles.Count; i++)

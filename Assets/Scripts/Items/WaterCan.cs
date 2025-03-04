@@ -10,12 +10,12 @@ namespace Farm
         }
         public override bool CanUse(Vector3Int target)
         {
-            return GameManager.Instance.Terrain.IsTilled(target);
+            return GameManager.Instance.TerrainMgr.IsTilled(target);
         }
 
         public override bool Use(Vector3Int target)
         {
-            GameManager.Instance.Terrain.WaterAt(target);
+            GameManager.Instance.TerrainMgr.WaterAt(target);
             return true;
         }
     }

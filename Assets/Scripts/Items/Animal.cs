@@ -13,12 +13,12 @@ namespace Farm
         public override bool CanUse(Vector3Int target)
         {
 
-            return GameManager.Instance.Terrain.IsGrazable(target, Crop);
+            return GameManager.Instance.TerrainMgr.IsGrazable(target, Crop);
         }
 
         public override bool Use(Vector3Int target)
         {
-            GameManager.Instance.Terrain.GrazeAt(target, Crop);
+            GameManager.Instance.TerrainMgr.GrazeAt(target, Crop);
             return true;
         }
     }

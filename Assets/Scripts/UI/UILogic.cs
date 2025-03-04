@@ -4,6 +4,7 @@
     void ShowMarket();
     void UpdateInventoryVisual(bool bForce);
     void ShowLandList();
+    void UpdateIdleWorkers();
     void ShowGameOver();
 }
 
@@ -33,6 +34,10 @@ public class UIHandler
     public void UpdateInventoryVisual(bool bForce)
     {
         _gameUI.UpdateInventoryVisual(bForce);
+    }
+    public void UpdateIdleWorkers()
+    {
+        _gameUI.UpdateIdleWorkers();
     }
     public void GameOver()
     {

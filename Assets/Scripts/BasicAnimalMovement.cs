@@ -75,15 +75,9 @@ namespace Farm
         void PickNewTarget()
         {
             m_IsIdle = false;
-            var dir = Quaternion.Euler(0, 0, 360.0f * Random.Range(0.0f, 1.0f)) * Vector2.up;
-
-            dir *= Random.Range(1.0f, 10.0f);
-
-            var pos = (Vector2)transform.position;
-            var pts = pos + (Vector2)dir;
 
             int randomIndex = Random.Range(0, Area.Length-1);
-            pts = new Vector2(Area[randomIndex].x, Area[randomIndex].y);
+            var pts = new Vector2(Area[randomIndex].x, Area[randomIndex].y);
             
             m_CurrentTarget = pts;
             var toTarget = m_CurrentTarget - transform.position;

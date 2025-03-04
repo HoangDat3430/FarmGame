@@ -11,7 +11,6 @@ public class GameUI : MonoBehaviour, IGameUI
     private GameObject itemForSell;
     private GameObject itemInstock;
     private GameObject farmTpl;
-    private GameObject workerTpl;
     private Transform sellPanel;
     private Transform buyPanel;
     private Transform inventoryPanel;
@@ -35,7 +34,6 @@ public class GameUI : MonoBehaviour, IGameUI
         itemForSell = Resources.Load<GameObject>("Prefabs/UI/ItemSellTpl");
         itemInstock = Resources.Load<GameObject>("Prefabs/UI/ItemBuyTpl");
         farmTpl = Resources.Load<GameObject>("Prefabs/UI/LandTpl");
-        workerTpl = Resources.Load<GameObject>("Prefabs/Worker");
 
         sellPanel = transform.Find("Store/ScrollView/Viewport/Sell");
         buyPanel = transform.Find("Store/ScrollView/Viewport/Buy");
@@ -228,8 +226,8 @@ public class GameUI : MonoBehaviour, IGameUI
     public void ShowLandList()
     {
         m_FarmList.SetActive(true);
-        var farmList = GameManager.Instance.Terrain.FieldGroups;
-        var lockedFarms = GameManager.Instance.Terrain.RemaningLock;
+        var farmList = GameManager.Instance.TerrainMgr.FieldGroups;
+        var lockedFarms = GameManager.Instance.TerrainMgr.RemaningLock;
         bool enough = farmList.Count <= farmPanel.childCount;
         if (!enough)
         {
@@ -255,7 +253,7 @@ public class GameUI : MonoBehaviour, IGameUI
             }
             else
             {
-                TerrainManager.CropData cropData = GameManager.Instance.Terrain.GetCropDataByFieldID(i);
+                TerrainManager.CropData cropData = GameManager.Instance.TerrainMgr.GetCropDataByFieldID(i);
                 if(cropData != null)
                 {
                     icon.gameObject.SetActive(true);
@@ -279,7 +277,7 @@ public class GameUI : MonoBehaviour, IGameUI
             return;
         }
         GameManager.Instance.AddCoin(-500);
-        GameManager.Instance.Terrain.UnlockFields(1);
+        GameManager.Instance.TerrainMgr.UnlockFields(1);
         ShowLandList();
     }
     private void CloseLandList()
@@ -292,12 +290,15 @@ public class GameUI : MonoBehaviour, IGameUI
         {
             return;
         }
-        Instantiate(workerTpl);
+
         GameManager.Instance.AddCoin(-500);
-        string[] text = m_IdleWorkers.text.Split("/");
-        int idle = int.Parse(text[0]);
-        int total = int.Parse(text[1]);
-        idle++; total++;
+        GameManager.Instance.WorkerMgr.EmployWorker();
+        UpdateIdleWorkers();
+    }
+    public void UpdateIdleWorkers()
+    {
+        int idle = GameManager.Instance.WorkerMgr.GetIdleWorkersCount();
+        int total = GameManager.Instance.WorkerMgr.Workers.Count;
         m_IdleWorkers.text = idle + "/" + total;
     }
     public void ShowGameOver()
