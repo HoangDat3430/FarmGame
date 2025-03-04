@@ -33,7 +33,7 @@ public class GameUI : MonoBehaviour, IGameUI
     private void Awake()
     {
         itemForSell = Resources.Load<GameObject>("Prefabs/UI/ItemSellTpl");
-        itemInstock = Resources.Load<GameObject>("Prefabs/UI/ItemTpl");
+        itemInstock = Resources.Load<GameObject>("Prefabs/UI/ItemBuyTpl");
         farmTpl = Resources.Load<GameObject>("Prefabs/UI/LandTpl");
         workerTpl = Resources.Load<GameObject>("Prefabs/Worker");
 
@@ -258,6 +258,7 @@ public class GameUI : MonoBehaviour, IGameUI
                 TerrainManager.CropData cropData = GameManager.Instance.Terrain.GetCropDataByFieldID(i);
                 if(cropData != null)
                 {
+                    icon.gameObject.SetActive(true);
                     icon.sprite = Resources.Load<Sprite>(cropData.GrowingCrop.Product.IconPath);
                     leftTime.transform.parent.gameObject.SetActive(true);
                     int time = (int)(cropData.GrowingCrop.GrowthTime - cropData.GrowthTimer);
@@ -265,7 +266,7 @@ public class GameUI : MonoBehaviour, IGameUI
                 }
                 else
                 {
-                    icon.sprite = null;
+                    icon.gameObject.SetActive(false);
                     leftTime.transform.parent.gameObject.SetActive(false);
                 }
             }
@@ -291,6 +292,7 @@ public class GameUI : MonoBehaviour, IGameUI
         {
             return;
         }
+        Instantiate(workerTpl);
         GameManager.Instance.AddCoin(-500);
         string[] text = m_IdleWorkers.text.Split("/");
         int idle = int.Parse(text[0]);
