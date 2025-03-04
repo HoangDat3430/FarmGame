@@ -32,7 +32,7 @@ namespace Farm
         public Item(int itemID)
         {
             this.ItemID = itemID;
-            ItemList.RowData rowData = GameManager.Instance.GetItemByID(Key);
+            ItemList.RowData rowData = GameManager.Instance.GetItemByItemID(Key);
             ItemName = rowData.ItemName;
             BuyPrice = rowData.BuyPrice;
             SellPrice = rowData.SellPrice   ;

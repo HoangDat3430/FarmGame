@@ -27,18 +27,21 @@ namespace Farm
         public Crop(int cropID)
         {
             this.CropID = cropID;
-            CropList.RowData rowData = GameManager.Instance.GetCropByID(Key);
+            CropList.RowData rowData = GameManager.Instance.GetCropByCropID(Key);
             GrowthTime = rowData.GrowthTime;
             NumberOfHarvest = rowData.HarvestNum;
             StageAfterHarvest = rowData.StageAfterHarvest;
             ProductPerHarvest = rowData.ProductPerHarvest;
             DryDeathTimer = rowData.DieTime;
             ProductID = rowData.ProductID;
-            GrowthStagesTiles = new TileBase[rowData.Stages];
-            for(int i = 0; i < rowData.Stages; i++)
+            if(rowData.RuleTile != string.Empty)
             {
-                GrowthStagesTiles[i] = new Tile();
-                (GrowthStagesTiles[i] as Tile).sprite = Resources.Load<Sprite>(rowData.RuleTile + i);
+                GrowthStagesTiles = new TileBase[rowData.Stages];
+                for (int i = 0; i < rowData.Stages; i++)
+                {
+                    GrowthStagesTiles[i] = new Tile();
+                    (GrowthStagesTiles[i] as Tile).sprite = Resources.Load<Sprite>(rowData.RuleTile + i);
+                }
             }
             Product = new Product(rowData.ProductID);
         }

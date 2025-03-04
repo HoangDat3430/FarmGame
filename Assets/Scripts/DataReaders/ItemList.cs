@@ -51,4 +51,15 @@ public class ItemList : CSVReader
     {
         return itemDic[itemId];
     }
+    public RowData GetByCropId(int cropId)
+    {
+        foreach(var item in itemDic)
+        {
+            if(item.Value.CropID == cropId)
+            {
+                return item.Value;
+            }
+        }
+        return null;
+    }
 }

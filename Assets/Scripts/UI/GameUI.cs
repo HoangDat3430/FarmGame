@@ -147,7 +147,7 @@ public class GameUI : MonoBehaviour, IGameUI
 
             Sprite iconSprite = Resources.Load<Sprite>(canBuyList[i].IconPath);
             item.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
-            CropList.RowData good = GameManager.Instance.GetCropByID(canBuyList[i].CropID);
+            CropList.RowData good = GameManager.Instance.GetCropByCropID(canBuyList[i].CropID);
             item.transform.Find("Data/HarvestNum/Count").GetComponent<TMP_Text>().text = good.HarvestNum.ToString();
             item.transform.Find("Data/GrowthTime/Count").GetComponent<TMP_Text>().text = good.GrowthTime.ToString();
 

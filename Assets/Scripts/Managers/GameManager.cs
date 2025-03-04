@@ -172,11 +172,15 @@ namespace Farm
         {
             uiLogic.UpdateInventoryVisual(bForce);
         }
-        public ItemList.RowData GetItemByID(int itemId)
+        public ItemList.RowData GetItemByItemID(int itemId)
         {
             return m_ItemConfigs.GetByItemId(itemId);
         }
-        public CropList.RowData GetCropByID(int cropId)
+        public ItemList.RowData GetItemByCropID(int cropId)
+        {
+            return m_ItemConfigs.GetByCropId(cropId);
+        }
+        public CropList.RowData GetCropByCropID(int cropId)
         {
             return m_CropConfigs.GetByCropId(cropId);
         }

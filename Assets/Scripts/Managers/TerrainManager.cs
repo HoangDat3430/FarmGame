@@ -235,7 +235,11 @@ namespace Farm
             //Debug.LogError(IsTilled(target) + " " + !m_CropData.ContainsKey(target) + " " + (cropInField == null || cropInField.CropID == crop.CropID));
             return IsTilled(target) && !m_CropData.ContainsKey(target) && (cropInField == null || cropInField.CropID == crop.CropID);
         }
-
+        public bool IsGrazable(Vector3Int target, Crop crop)
+        {
+            Crop cropInField = GameManager.Instance.Terrain.GetCropDataByPosition(target)?.GrowingCrop;
+            return IsTillable(target) && !m_CropData.ContainsKey(target) && cropInField == null;
+        }
         public bool IsTilled(Vector3Int target)
         {
             return m_GroundData.ContainsKey(target);
@@ -263,7 +267,25 @@ namespace Farm
             UpdateCropVisual(target);
 
         }
+        public void GrazeAt(Vector3Int target, Crop cattleToGraze)
+        {
+            var cropData = new CropData();
 
+            cropData.GrowingCrop = cattleToGraze;
+            cropData.GrowthTimer = 0.0f;
+            cropData.CurrentGrowthStage = 0;
+
+            if (GetCropDataByPosition(target) == null)
+            {
+                ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cattleToGraze.CropID);
+                GameObject animal = Resources.Load<GameObject>(rowData.PrefabPath);
+                Vector3Int position = GetFieldByTile(target)[3];
+                Instantiate(animal, position, Quaternion.identity);
+            }
+
+            m_CropData.Add(target, cropData);
+
+        }
         public void WaterAt(Vector3Int target)
         {
             var groundData = m_GroundData[target];
@@ -318,13 +340,12 @@ namespace Farm
                     if (groundData.WaterTimer <= 0.0f)
                     {
                         WaterTilemap.SetTile(cell, null);
-                        //GroundTilemap.SetColor(cell, Color.white);
                     }
                 }
 
                 if (m_CropData.TryGetValue(cell, out var cropData))
                 {
-                    if (groundData.WaterTimer <= 0.0f)
+                    if (groundData.WaterTimer <= 0.0f && cropData.GrowingCrop.GrowthStagesTiles.Length != 0)
                     {
                         cropData.DyingTimer += Time.deltaTime;
                         if (cropData.DyingTimer > cropData.GrowingCrop.DryDeathTimer)
@@ -339,12 +360,14 @@ namespace Farm
                         cropData.GrowthTimer = Mathf.Clamp(cropData.GrowthTimer + Time.deltaTime, 0.0f,
                             cropData.GrowingCrop.GrowthTime);
                         cropData.GrowthRatio = cropData.GrowthTimer / cropData.GrowingCrop.GrowthTime;
-                        int growthStage = cropData.GrowingCrop.GetGrowthStage(cropData.GrowthRatio);
-
-                        if (growthStage != cropData.CurrentGrowthStage)
+                        if(cropData.GrowingCrop.GrowthStagesTiles.Length != 0)
                         {
-                            cropData.CurrentGrowthStage = growthStage;
-                            UpdateCropVisual(cell);
+                            int growthStage = cropData.GrowingCrop.GetGrowthStage(cropData.GrowthRatio);
+                            if (growthStage != cropData.CurrentGrowthStage)
+                            {
+                                cropData.CurrentGrowthStage = growthStage;
+                                UpdateCropVisual(cell);
+                            }
                         }
                     }
                 }
