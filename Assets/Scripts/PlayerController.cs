@@ -130,11 +130,6 @@ namespace Farm
             m_CurrentInteractiveTarget = null;
             m_HasTarget = false;
             
-            //if (!IsMouseOverGameWindow())
-            //{
-            //    return;
-            //}
-            
             m_CurrentWorldMousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             //check if we are above an interactive object
             var overlapCount = Physics2D.OverlapPointNonAlloc(m_CurrentWorldMousePos, m_CollidersCache, 1 << 31);
@@ -223,11 +218,8 @@ namespace Farm
             else
             {
                 //we aren't moving, look direction is based on the currently aimed toward point
-                if (IsMouseOverGameWindow())
-                {
-                    Vector3 posToMouse = m_CurrentWorldMousePos - transform.position;
-                    SetLookDirectionFrom(posToMouse);
-                }
+                Vector3 posToMouse = m_CurrentWorldMousePos - transform.position;
+                SetLookDirectionFrom(posToMouse);
             }
 
             var movement = move * Speed;
@@ -239,11 +231,6 @@ namespace Farm
 
             m_Rigidbody.MovePosition(m_Rigidbody.position + movement * Time.deltaTime);
         }
-
-        bool IsMouseOverGameWindow()
-        {
-            return !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
-        } 
 
         void SetLookDirectionFrom(Vector2 direction)
         {

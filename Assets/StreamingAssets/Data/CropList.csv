@@ -1,5 +1,5 @@
 CropID,Stages,RuleTile,GrowthTime,Number of Harvest,Stage after Harvest,Product per Harvest,DieTime,ProductID
-1,4,Sprites/Carrot/Sprite_Carrot_0,10,40,2,1,3000,4
-2,5,Sprites/Corn/Sprite_Corn_0,15,40,3,1,3000,5
-3,5,Sprites/Wheat/Sprite_Wheat_0,5,20,3,1,3000,6
+1,4,Sprites/Plants/Carrot/Sprite_Carrot_0,10,40,2,1,3000,4
+2,5,Sprites/Plants/Corn/Sprite_Corn_0,15,40,3,1,3000,5
+3,5,Sprites/Plants/Wheat/Sprite_Wheat_0,5,20,3,1,3000,6
 4,2,,30,100,0,1,3000,11

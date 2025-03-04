@@ -99,7 +99,7 @@ namespace Farm
             m_CurrentTimeOfTheDay = StartingTime;
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
             uiLogic = new UIHandler(gameUI);
-            AddCoin(500);
+            AddCoin(5000);
             Terrain.UnlockFields(3);
         }
 

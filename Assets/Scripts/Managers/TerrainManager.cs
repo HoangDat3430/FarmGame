@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 using UnityEngine.VFX;
@@ -188,15 +189,15 @@ namespace Farm
         }
         public void UnlockFields(int amount)
         {
-            for (int i = 1; i < remainingLock.Count; i++)
+            for (int i = 1; i <= fieldGroups.Count; i++)
             {
                 if (remainingLock.ContainsKey(i))
                 {
                     Destroy(remainingLock[i]);
                     remainingLock.Remove(i);
                     amount--;
+                    if (amount == 0) return;
                 }
-                if (amount == 0) return;
             }
         }
         private void InitFarmLands()
@@ -240,13 +241,12 @@ namespace Farm
         public bool IsPlantable(Vector3Int target, Crop crop)
         {
             Crop cropInField = GameManager.Instance.Terrain.GetCropDataByPosition(target)?.GrowingCrop;
-            //Debug.LogError(IsTilled(target) + " " + !m_CropData.ContainsKey(target) + " " + (cropInField == null || cropInField.CropID == crop.CropID));
             return IsTilled(target) && !m_CropData.ContainsKey(target) && (cropInField == null || cropInField.CropID == crop.CropID);
         }
         public bool IsGrazable(Vector3Int target, Crop crop)
         {
             Crop cropInField = GameManager.Instance.Terrain.GetCropDataByPosition(target)?.GrowingCrop;
-            return IsTillable(target) && !m_CropData.ContainsKey(target) && cropInField == null;
+            return (IsTillable(target) || IsTilled(target)) && !m_CropData.ContainsKey(target) && cropInField == null;
         }
         public bool IsTilled(Vector3Int target)
         {
