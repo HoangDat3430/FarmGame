@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using Random = UnityEngine.Random;
 
 
@@ -9,7 +12,6 @@ namespace Farm
     /// </summary>
     public class BasicAnimalMovement : MonoBehaviour
     {
-        public Collider2D Area;
 
         [Min(0)] public float MinIdleTime;
         [Min(0)] public float MaxIdleTime;
@@ -18,7 +20,8 @@ namespace Farm
 
         private float m_IdleTimer;
         private float m_CurrentIdleTarget;
-
+        
+        private Vector3Int[] Area = new Vector3Int[10];
 
         private Vector3 m_CurrentTarget;
 
@@ -35,7 +38,6 @@ namespace Farm
             m_Animator = GetComponentInChildren<Animator>();
 
             m_IsIdle = true;
-            PickNewIdleTime();
         }
 
         private void Update()
@@ -44,7 +46,7 @@ namespace Farm
             {
                 m_IdleTimer += Time.deltaTime;
 
-                if (m_IdleTimer >= m_CurrentIdleTarget)
+                if (m_IdleTimer >= m_CurrentIdleTarget && Area.Length > 0)
                 {
                     PickNewTarget();
                 }
@@ -79,11 +81,9 @@ namespace Farm
             var pos = (Vector2)transform.position;
             var pts = pos + (Vector2)dir;
 
-            if (!Area.OverlapPoint(pts))
-            {
-                pts = Area.ClosestPoint(pts);
-            }
-
+            int randomIndex = Random.Range(0, Area.Length-1);
+            pts = new Vector2(Area[randomIndex].x, Area[randomIndex].y);
+            
             m_CurrentTarget = pts;
             var toTarget = m_CurrentTarget - transform.position;
 
@@ -92,6 +92,11 @@ namespace Farm
 
             if (m_Animator != null)
                 m_Animator.SetFloat(SpeedHash, Speed);
+        }
+        public void SetField(Vector3Int target)
+        {
+            Area = GameManager.Instance.Terrain.GetFieldByTile(target).ToArray();
+            PickNewTarget();
         }
     }
 }

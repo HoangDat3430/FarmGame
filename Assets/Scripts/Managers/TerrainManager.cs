@@ -278,9 +278,10 @@ namespace Farm
             if (GetCropDataByPosition(target) == null)
             {
                 ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cattleToGraze.CropID);
-                GameObject animal = Resources.Load<GameObject>(rowData.PrefabPath);
-                Vector3Int position = GetFieldByTile(target)[3];
-                Instantiate(animal, position, Quaternion.identity);
+                GameObject animalPrefab = Resources.Load<GameObject>(rowData.PrefabPath);
+                Vector3Int position = GetFieldByTile(target)[4];
+                GameObject animal = Instantiate(animalPrefab, position, Quaternion.identity);
+                animal.GetComponent<BasicAnimalMovement>().SetField(target);
             }
 
             m_CropData.Add(target, cropData);
