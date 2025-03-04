@@ -130,10 +130,10 @@ namespace Farm
             m_CurrentInteractiveTarget = null;
             m_HasTarget = false;
             
-            if (!IsMouseOverGameWindow())
-            {
-                return;
-            }
+            //if (!IsMouseOverGameWindow())
+            //{
+            //    return;
+            //}
             
             m_CurrentWorldMousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             //check if we are above an interactive object

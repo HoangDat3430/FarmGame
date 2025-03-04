@@ -48,6 +48,7 @@ namespace Farm
             public float DyingTimer;
             public bool HarvestDone => HarvestCount == GrowingCrop.NumberOfHarvest;
 
+            public GameObject Animal;
             public void Init()
             {
                 GrowingCrop = null;
@@ -57,17 +58,24 @@ namespace Farm
                 HarvestCount = 0;
                 DyingTimer = 0.0f;
             }
-
+            public void DisplayAnimalProduct()
+            {
+                Animal.transform.Find("Product").gameObject.SetActive(Mathf.Approximately(GrowthRatio, 1.0f));
+            }
             public Crop Harvest()
             {
                 var crop = GrowingCrop;
-
+                //for all plant and animal because when graze an animal in a field, each cell seem to have a crop for that animal
                 HarvestCount += 1;
-
                 CurrentGrowthStage = GrowingCrop.StageAfterHarvest;
                 GrowthRatio = CurrentGrowthStage / (float)GrowingCrop.GrowthStagesTiles.Length;
                 GrowthTimer = GrowingCrop.GrowthTime * GrowthRatio;
-
+                //for animal product because there is only 1 animal in a field
+                if (crop.RuleTile == string.Empty && Animal == null)
+                {
+                    return null;
+                }
+                
                 return crop;
             }
         }
@@ -269,23 +277,26 @@ namespace Farm
         }
         public void GrazeAt(Vector3Int target, Crop cattleToGraze)
         {
-            var cropData = new CropData();
-
-            cropData.GrowingCrop = cattleToGraze;
-            cropData.GrowthTimer = 0.0f;
-            cropData.CurrentGrowthStage = 0;
-
-            if (GetCropDataByPosition(target) == null)
+            List<Vector3Int> field = GetFieldByTile(target);
+            for (int i = 0; i < field.Count; i++)
             {
-                ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cattleToGraze.CropID);
-                GameObject animalPrefab = Resources.Load<GameObject>(rowData.PrefabPath);
-                Vector3Int position = GetFieldByTile(target)[4];
-                GameObject animal = Instantiate(animalPrefab, position, Quaternion.identity);
-                animal.GetComponent<BasicAnimalMovement>().SetField(target);
+                var cropData = new CropData();
+
+                cropData.GrowingCrop = cattleToGraze;
+                cropData.GrowthTimer = 0.0f;
+                cropData.CurrentGrowthStage = 0;
+
+                if (i==0)
+                {
+                    ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cattleToGraze.CropID);
+                    GameObject animalPrefab = Resources.Load<GameObject>(rowData.PrefabPath);
+                    GameObject animal = Instantiate(animalPrefab, target, Quaternion.identity);
+                    animal.GetComponent<BasicAnimalMovement>().SetField(field);
+                    cropData.Animal = animal;
+                }
+                TillAt(field[i]);
+                m_CropData.Add(field[i], cropData);
             }
-
-            m_CropData.Add(target, cropData);
-
         }
         public void WaterAt(Vector3Int target)
         {
@@ -307,6 +318,10 @@ namespace Farm
             if (data.HarvestDone)
             {
                 m_CropData.Remove(target);
+                if(data.Animal != null)
+                {
+                    Destroy(data.Animal);
+                }
             }
 
             UpdateCropVisual(target);
@@ -346,7 +361,7 @@ namespace Farm
 
                 if (m_CropData.TryGetValue(cell, out var cropData))
                 {
-                    if (groundData.WaterTimer <= 0.0f && cropData.GrowingCrop.GrowthStagesTiles.Length != 0)
+                    if (groundData.WaterTimer <= 0.0f && cropData.GrowingCrop.RuleTile != string.Empty)
                     {
                         cropData.DyingTimer += Time.deltaTime;
                         if (cropData.DyingTimer > cropData.GrowingCrop.DryDeathTimer)
@@ -358,17 +373,13 @@ namespace Farm
                     else
                     {
                         cropData.DyingTimer = 0.0f;
-                        cropData.GrowthTimer = Mathf.Clamp(cropData.GrowthTimer + Time.deltaTime, 0.0f,
-                            cropData.GrowingCrop.GrowthTime);
+                        cropData.GrowthTimer = Mathf.Clamp(cropData.GrowthTimer + Time.deltaTime, 0.0f, cropData.GrowingCrop.GrowthTime);
                         cropData.GrowthRatio = cropData.GrowthTimer / cropData.GrowingCrop.GrowthTime;
-                        if(cropData.GrowingCrop.GrowthStagesTiles.Length != 0)
+                        int growthStage = cropData.GrowingCrop.GetGrowthStage(cropData.GrowthRatio);
+                        if (growthStage != cropData.CurrentGrowthStage)
                         {
-                            int growthStage = cropData.GrowingCrop.GetGrowthStage(cropData.GrowthRatio);
-                            if (growthStage != cropData.CurrentGrowthStage)
-                            {
-                                cropData.CurrentGrowthStage = growthStage;
-                                UpdateCropVisual(cell);
-                            }
+                            cropData.CurrentGrowthStage = growthStage;
+                            UpdateCropVisual(cell);
                         }
                     }
                 }
@@ -382,7 +393,11 @@ namespace Farm
             }
             else
             {
-                CropTilemap.SetTile(target, data.GrowingCrop.GrowthStagesTiles[data.CurrentGrowthStage]);
+                if(data.Animal != null)
+                {
+                    data.DisplayAnimalProduct();
+                }
+                CropTilemap.SetTile(target, data.GrowingCrop.GrowthStagesTiles?[data.CurrentGrowthStage]);
             }
         }
         public CropData GetCropDataByFieldID(int fieldID)

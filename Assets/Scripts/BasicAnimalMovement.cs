@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -93,9 +94,9 @@ namespace Farm
             if (m_Animator != null)
                 m_Animator.SetFloat(SpeedHash, Speed);
         }
-        public void SetField(Vector3Int target)
+        public void SetField(List<Vector3Int> area)
         {
-            Area = GameManager.Instance.Terrain.GetFieldByTile(target).ToArray();
+            Area = area.ToArray();
             PickNewTarget();
         }
     }

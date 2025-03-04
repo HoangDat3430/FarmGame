@@ -23,6 +23,8 @@ namespace Farm
         public int ProductPerHarvest;
         public float DryDeathTimer;
         public int ProductID;
+        public int Stages;
+        public string RuleTile;
 
         public Crop(int cropID)
         {
@@ -34,9 +36,11 @@ namespace Farm
             ProductPerHarvest = rowData.ProductPerHarvest;
             DryDeathTimer = rowData.DieTime;
             ProductID = rowData.ProductID;
+            Stages = rowData.Stages;
+            RuleTile = rowData.RuleTile;
+            GrowthStagesTiles = new TileBase[Stages];
             if(rowData.RuleTile != string.Empty)
             {
-                GrowthStagesTiles = new TileBase[rowData.Stages];
                 for (int i = 0; i < rowData.Stages; i++)
                 {
                     GrowthStagesTiles[i] = new Tile();
@@ -48,7 +52,7 @@ namespace Farm
 
         public int GetGrowthStage(float growRatio)
         {
-            return Mathf.FloorToInt(growRatio * (GrowthStagesTiles.Length-1));
+            return Mathf.FloorToInt(growRatio * (Stages-1));
         }
     }
 }
