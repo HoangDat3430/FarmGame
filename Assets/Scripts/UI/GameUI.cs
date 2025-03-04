@@ -8,15 +8,17 @@ using System.Linq;
 
 public class GameUI : MonoBehaviour, IGameUI
 {
-    public GameObject itemForSell;
-    public GameObject itemInstock;
-    public GameObject farmTpl;
-    public Transform sellPanel;
-    public Transform buyPanel;
-    public Transform inventoryPanel;
-    public Transform farmPanel;
+    private GameObject itemForSell;
+    private GameObject itemInstock;
+    private GameObject farmTpl;
+    private GameObject workerTpl;
+    private Transform sellPanel;
+    private Transform buyPanel;
+    private Transform inventoryPanel;
+    private Transform farmPanel;
 
     private TMP_Text m_CoinText;
+    private TMP_Text m_IdleWorkers;
     private GameObject m_Store;
     private GameObject m_FarmList;
     private GameObject m_GameOverPanel;
@@ -26,10 +28,23 @@ public class GameUI : MonoBehaviour, IGameUI
     private Button m_CloseStoreBtn;
     private Button m_ExpandFarmBtn;
     private Button m_CloseFarmListBtn;
+    private Button m_EmployBtn;
 
     private void Awake()
     {
+        itemForSell = Resources.Load<GameObject>("Prefabs/UI/ItemSellTpl");
+        itemInstock = Resources.Load<GameObject>("Prefabs/UI/ItemTpl");
+        farmTpl = Resources.Load<GameObject>("Prefabs/UI/LandTpl");
+        workerTpl = Resources.Load<GameObject>("Prefabs/Worker");
+
+        sellPanel = transform.Find("Store/ScrollView/Viewport/Sell");
+        buyPanel = transform.Find("Store/ScrollView/Viewport/Buy");
+        inventoryPanel = transform.Find("Inventory");
+        farmPanel = transform.Find("FarmList/ScrollView/Viewport");
+
         m_CoinText = transform.Find("Coin").GetComponent<TMP_Text>();
+        m_IdleWorkers = transform.Find("Workers").GetComponent<TMP_Text>();
+        m_IdleWorkers.text = "0/0";
         m_Store = transform.Find("Store").gameObject;
         m_FarmList = transform.Find("FarmList").gameObject;
         m_SellBtn = m_Store.transform.Find("SellBtn").GetComponent<Button>();
@@ -37,6 +52,7 @@ public class GameUI : MonoBehaviour, IGameUI
         m_CloseStoreBtn = m_Store.transform.Find("CloseBtn").GetComponent<Button>();
         m_ExpandFarmBtn = transform.Find("ExpandFarm").GetComponent<Button>();
         m_CloseFarmListBtn = transform.Find("FarmList/CloseBtn").GetComponent<Button>();
+        m_EmployBtn = transform.Find("EmployWorker").GetComponent<Button>();
     }
     private void Start()
     {
@@ -45,6 +61,7 @@ public class GameUI : MonoBehaviour, IGameUI
         RegisterButtonEvent(m_CloseStoreBtn, CloseMarket);
         RegisterButtonEvent(m_ExpandFarmBtn, ShowLandList);
         RegisterButtonEvent(m_CloseFarmListBtn, CloseLandList);
+        RegisterButtonEvent(m_EmployBtn, EmployWorker);
         UpdateInventoryVisual(true);
     }
     public void UpdateCoin(int coin)
@@ -267,6 +284,19 @@ public class GameUI : MonoBehaviour, IGameUI
     private void CloseLandList()
     {
         m_FarmList.SetActive(false);
+    }
+    private void EmployWorker()
+    {
+        if (GameManager.Instance.Coin < 500)
+        {
+            return;
+        }
+        GameManager.Instance.AddCoin(-500);
+        string[] text = m_IdleWorkers.text.Split("/");
+        int idle = int.Parse(text[0]);
+        int total = int.Parse(text[1]);
+        idle++; total++;
+        m_IdleWorkers.text = idle + "/" + total;
     }
     public void ShowGameOver()
     {
