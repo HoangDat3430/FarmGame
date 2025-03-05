@@ -41,18 +41,12 @@ namespace Farm
             Entries[1].StackSize = 1;
             Entries[2].Item = new WaterCan();
             Entries[2].StackSize = 1;
-            //Entries[3].Item = new CornSeedBag();
-            //Entries[3].StackSize = 10;
-            Entries[4].Item = new SeedBag(9);
+            Entries[3].Item = new SeedBag(7);
+            Entries[3].StackSize = 10;
+            Entries[4].Item = new SeedBag(8);
             Entries[4].StackSize = 10;
             Entries[5].Item = new Animal(10);
             Entries[5].StackSize = 1;
-            Entries[6].Item = new Product(5);
-            Entries[6].StackSize = 10;
-            Entries[7].Item = new Product(6);
-            Entries[7].StackSize = 10;
-            Entries[8].Item = new Product(11);
-            Entries[8].StackSize = 10;
         }
 
         //return true if the object could be used

@@ -70,6 +70,13 @@ public class GameUI : MonoBehaviour, IGameUI
         RegisterButtonEvent(m_ExitBtn, ExitGame);
         UpdateInventoryVisual(true);
     }
+    private void Update()
+    {
+        if (m_FarmList.activeSelf)
+        {
+            ShowLandList();
+        }
+    }
     public void UpdateCoin()
     {
         m_CoinText.text = GameManager.Instance.Player.Coins.ToString();
@@ -176,9 +183,10 @@ public class GameUI : MonoBehaviour, IGameUI
             Sprite iconSprite = Resources.Load<Sprite>(canBuyList[i].IconPath);
             item.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
             CropList.RowData good = GameManager.Instance.GetCropByCropID(canBuyList[i].CropID);
+            int growthTime = good.GrowthTime / 60;
             item.transform.Find("Data/HarvestNum/Count").GetComponent<TMP_Text>().text = good.HarvestNum.ToString();
-            item.transform.Find("Data/GrowthTime/Count").GetComponent<TMP_Text>().text = good.GrowthTime.ToString();
-
+            item.transform.Find("Data/GrowthTime/Count").GetComponent<TMP_Text>().text = string.Format("{0}m", growthTime);
+            
             Item newItem = new Item(canBuyList[i].ItemID);
             Button buttonBuy = item.transform.Find("Buy").GetComponent<Button>();
             buttonBuy.gameObject.SetActive(!newItem.WholeSale);
@@ -281,7 +289,12 @@ public class GameUI : MonoBehaviour, IGameUI
                     icon.sprite = Resources.Load<Sprite>(cropData.GrowingCrop.Product.IconPath);
                     leftTime.transform.parent.gameObject.SetActive(true);
                     int time = (int)(cropData.GrowingCrop.GrowthTime - cropData.GrowthTimer);
-                    leftTime.text = time.ToString();
+                    TimeSpan timeSpan = TimeSpan.FromSeconds(time);
+                    string formattedTime = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                        timeSpan.Hours,
+                        timeSpan.Minutes,
+                        timeSpan.Seconds);
+                    leftTime.text = formattedTime;
                 }
                 else
                 {

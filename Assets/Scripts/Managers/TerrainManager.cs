@@ -17,7 +17,7 @@ namespace Farm
         [Serializable]
         public class GroundData
         {
-            public const float WaterDuration = 60 * 1.0f;
+            public const float WaterDuration = 60 * 60.0f;
 
             public float WaterTimer;
         }
@@ -344,6 +344,11 @@ namespace Farm
             if (data == null || !Mathf.Approximately(data.GrowthRatio, 1.0f)) return null;
 
             var produce = data.Harvest();
+            int fieldId = GetFieldIdByTile(target);
+            if (m_WaitingToHarvestFields.Contains(fieldId))
+            {
+                m_WaitingToHarvestFields.Remove(fieldId);
+            }
 
             if (data.HarvestDone)
             {
