@@ -67,11 +67,19 @@ namespace Farm
         private UIHandler uiLogic;
 
         private int m_Coin;
+        private int m_ToolLevel = 1;
         public int Coin
         {
             get
             {
                 return m_Coin;
+            }
+        }
+        public int ToolLevel
+        {
+            get
+            {
+                return m_ToolLevel;
             }
         }
         private void Awake()
@@ -100,6 +108,8 @@ namespace Farm
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
             uiLogic = new UIHandler(gameUI);
             AddCoin(5000);
+            uiLogic.UpdateToolLevel();
+            uiLogic.UpdateIdleWorkers();
             TerrainMgr.UnlockFields(3);
         }
 
@@ -175,6 +185,11 @@ namespace Farm
         public void UpdateIdleWorkers()
         {
             uiLogic.UpdateIdleWorkers();
+        }
+        public void UpgradeTool()
+        {
+            m_ToolLevel++;
+            uiLogic.UpdateToolLevel();
         }
         public ItemList.RowData GetItemByItemID(int itemId)
         {

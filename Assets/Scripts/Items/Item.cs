@@ -7,7 +7,8 @@ namespace Farm
         None,
         Tool,
         SeedBag,
-        Animal
+        Animal,
+        Product,
     }
     public class Item
     {

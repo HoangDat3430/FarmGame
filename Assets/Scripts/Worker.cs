@@ -25,6 +25,7 @@ namespace Farm
         // Start is called before the first frame update
         void Awake()
         {
+            m_fieldToHavest = -1;
             m_IsIdle = true;
             m_HarvestTime = 2;
             m_HarvestTimer = 0;
@@ -37,9 +38,9 @@ namespace Farm
             if (transform.position != m_CurrentTarget)
             {
                 transform.position = Vector3.MoveTowards(transform.position, m_CurrentTarget, m_Speed * Time.deltaTime);
-                if (!IsIdle)
+                if (!m_IsIdle)
                 {
-                    CropData cropData = GameManager.Instance.TerrainMgr.GetCropDataAt(Vector3Int.RoundToInt(m_CurrentTarget));
+                    CropData cropData = GameManager.Instance.TerrainMgr.GetCropDataByFieldID(m_fieldToHavest);
                     if (cropData == null || !Mathf.Approximately(cropData.GrowthRatio, 1.0f))
                     {
                         GoToWareHouse();
@@ -58,6 +59,7 @@ namespace Farm
                     {
                         Harvest();
                         m_HarvestTimer = 0;
+                        GameManager.Instance.TerrainMgr.OnWorkerHavestDone(m_fieldToHavest);
                         GoToWareHouse();
                     }
                 }
@@ -65,21 +67,22 @@ namespace Farm
         }
         private void Harvest()
         {
-            List<Vector3Int> fieldToHarvest = GameManager.Instance.TerrainMgr.GetFieldByTile(Vector3Int.RoundToInt(m_CurrentTarget));
+            if(m_fieldToHavest == -1)
+            {
+                return;
+            }
+            List<Vector3Int> fieldToHarvest = GameManager.Instance.TerrainMgr.FieldGroups[m_fieldToHavest];
             for (int i = 0; i < fieldToHarvest.Count; i++)
             {
                 var product = GameManager.Instance.TerrainMgr.HarvestAt(fieldToHarvest[i]);
 
                 if (product != null)
                 {
-                    for (int j = 0; j < product.ProductPerHarvest; j++)
-                    {
-                        GameManager.Instance.Player.AddItem(product.Product);
-                    }
+                    float toolBoost = (float)(GameManager.Instance.ToolLevel - 1) / 10;
+                    float productivityBoost = product.ProductPerHarvest + toolBoost;
+                    GameManager.Instance.Player.AddItem(product.Product, productivityBoost);
                 }
             }
-            GameManager.Instance.TerrainMgr.OnWorkerHavestDone(m_fieldToHavest);
-            m_fieldToHavest = -1;
         }
         public void GoToHavest(int fieldId, Vector3Int des)
         {

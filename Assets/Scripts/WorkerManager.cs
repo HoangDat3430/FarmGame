@@ -26,23 +26,20 @@ public class WorkerManager : MonoBehaviour
 
     void Update()
     {
-        if(GetIdleWorkersCount() > 0)
+        for (int i = 0; i < m_Workers.Count; i++)
         {
-            int fieldId = GameManager.Instance.TerrainMgr.GetHarvestableField();
-            if (fieldId != -1)
+            if (m_Workers[i].IsIdle)
             {
-                for (int i = 0; i < m_Workers.Count; i++)
+                int fieldId = GameManager.Instance.TerrainMgr.GetHarvestableField();
+                if (fieldId != -1)
                 {
-                    if (m_Workers[i].IsIdle)
-                    {
-                        Vector3Int fieldPosition = GameManager.Instance.TerrainMgr.AddWaitingToHarvestField(fieldId);
-                        m_Workers[i].GoToHavest(fieldId, fieldPosition);
-                        return;
-                    }
+                    Vector3Int fieldPosition = GameManager.Instance.TerrainMgr.AddWaitingToHarvestField(fieldId);
+                    m_Workers[i].GoToHavest(fieldId, fieldPosition);
+                    return;
                 }
+                        
             }
         }
-        
     }
     public void EmployWorker()
     {

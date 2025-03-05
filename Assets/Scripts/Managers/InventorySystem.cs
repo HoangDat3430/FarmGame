@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditorInternal.Profiling.Memory.Experimental;
+using Unity.VisualScripting;
+
 
 
 #if UNITY_EDITOR
@@ -23,7 +25,7 @@ namespace Farm
         public class InventoryEntry
         {
             public Item Item;
-            public int StackSize;
+            public float StackSize;
         }
 
         public int EquippedItemIdx { get; private set; }
@@ -93,10 +95,8 @@ namespace Farm
             {
                 if (Entries[i].Item?.ItemID == newItem.ItemID)
                 {
-                    int size = newItem.MaxStackSize - Entries[i].StackSize;
-                    toFit -= size;
-
-                    if (toFit <= 0)
+                    float size = newItem.MaxStackSize - Entries[i].StackSize;
+                    if (toFit <= size)
                         return true;
                 }
             }
@@ -113,21 +113,19 @@ namespace Farm
 
             return toFit == 0;
         }
-        public bool AddItem(Item newItem, int amount = 1)
+        public bool AddItem(Item newItem, float amount = 1)
         {
             SpecifyItem(ref newItem);
-            int remainingToFit = amount;
-            
             //first we check if there is already that item in the inventory
             for (int i = 0; i < InventorySize; ++i)
             {
-                if (Entries[i].Item?.ItemID == newItem.ItemID && Entries[i].StackSize < newItem.MaxStackSize)
+                if (Entries[i].Item?.ItemID == newItem.ItemID)
                 {
-                    int fit = Mathf.Min(newItem.MaxStackSize - Entries[i].StackSize, remainingToFit);
-                    Entries[i].StackSize += fit;
-                    remainingToFit -= fit;
-                    if (remainingToFit == 0)
+                    float available = newItem.MaxStackSize - Entries[i].StackSize;
+                    if(available >= amount)
                     {
+                        Entries[i].StackSize += amount;
+                        Entries[i].StackSize = (float)Math.Round(Entries[i].StackSize * 10) / 10;
                         GameManager.Instance.UpdateInventoryVisual(true);
                         return true;
                     }
@@ -140,18 +138,13 @@ namespace Farm
                 if (Entries[i].Item == null)
                 {
                     Entries[i].Item = newItem;
-                    int fit = Mathf.Min(newItem.MaxStackSize - Entries[i].StackSize, remainingToFit);
-                    remainingToFit -= fit;
-                    Entries[i].StackSize = fit;
-                    if (remainingToFit == 0)
-                    {
-                        GameManager.Instance.UpdateInventoryVisual(true);
-                        return true;
-                    }
+                    Entries[i].StackSize = amount;
+                    GameManager.Instance.UpdateInventoryVisual(true);
+                    return true;
                 }
             }
             //we couldn't had so no space left
-            return remainingToFit == 0;
+            return false;
         }
 
         public void EquipNext()
@@ -171,7 +164,7 @@ namespace Farm
             List<InventoryEntry> list = new List<InventoryEntry>();
             foreach(var entry in Entries)
             {
-                if(entry.Item != null && entry.Item.SellPrice != -1)
+                if (entry.Item != null && entry.Item.SellPrice != -1 && entry.StackSize >= 1)
                 {
                     list.Add(entry);
                 }

@@ -5,6 +5,7 @@
     void UpdateInventoryVisual(bool bForce);
     void ShowLandList();
     void UpdateIdleWorkers();
+    void UpdateToolLevel();
     void ShowGameOver();
 }
 
@@ -38,6 +39,10 @@ public class UIHandler
     public void UpdateIdleWorkers()
     {
         _gameUI.UpdateIdleWorkers();
+    }
+    public void UpdateToolLevel()
+    {
+        _gameUI.UpdateToolLevel();
     }
     public void GameOver()
     {

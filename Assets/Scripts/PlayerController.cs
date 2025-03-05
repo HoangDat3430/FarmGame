@@ -249,10 +249,10 @@ namespace Farm
             return m_Inventory.CanFitItem(item, count);
         }
         
-        public bool AddItem(Item newItem)
+        public bool AddItem(Item newItem, float amount = 1)
         {
             CreateItemVisual(newItem);
-            return m_Inventory.AddItem(newItem);
+            return m_Inventory.AddItem(newItem, amount);
         }
         public void ToggleControl(bool canControl)
         {

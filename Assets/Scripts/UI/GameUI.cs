@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using Farm;
 using UnityEngine.Events;
-using System.Linq;
+using System;
 
 public class GameUI : MonoBehaviour, IGameUI
 {
@@ -18,6 +18,7 @@ public class GameUI : MonoBehaviour, IGameUI
 
     private TMP_Text m_CoinText;
     private TMP_Text m_IdleWorkers;
+    private TMP_Text m_ToolLevel;
     private GameObject m_Store;
     private GameObject m_FarmList;
     private GameObject m_GameOverPanel;
@@ -28,6 +29,7 @@ public class GameUI : MonoBehaviour, IGameUI
     private Button m_ExpandFarmBtn;
     private Button m_CloseFarmListBtn;
     private Button m_EmployBtn;
+    private Button m_UpgradeBtn;
 
     private void Awake()
     {
@@ -42,7 +44,7 @@ public class GameUI : MonoBehaviour, IGameUI
 
         m_CoinText = transform.Find("Coin").GetComponent<TMP_Text>();
         m_IdleWorkers = transform.Find("Workers").GetComponent<TMP_Text>();
-        m_IdleWorkers.text = "0/0";
+        m_ToolLevel = transform.Find("ToolLevel").GetComponent<TMP_Text>();
         m_Store = transform.Find("Store").gameObject;
         m_FarmList = transform.Find("FarmList").gameObject;
         m_SellBtn = m_Store.transform.Find("SellBtn").GetComponent<Button>();
@@ -51,6 +53,7 @@ public class GameUI : MonoBehaviour, IGameUI
         m_ExpandFarmBtn = transform.Find("ExpandFarm").GetComponent<Button>();
         m_CloseFarmListBtn = transform.Find("FarmList/CloseBtn").GetComponent<Button>();
         m_EmployBtn = transform.Find("EmployWorker").GetComponent<Button>();
+        m_UpgradeBtn = transform.Find("UpgradeTool").GetComponent<Button>();
     }
     private void Start()
     {
@@ -60,6 +63,7 @@ public class GameUI : MonoBehaviour, IGameUI
         RegisterButtonEvent(m_ExpandFarmBtn, ShowLandList);
         RegisterButtonEvent(m_CloseFarmListBtn, CloseLandList);
         RegisterButtonEvent(m_EmployBtn, EmployWorker);
+        RegisterButtonEvent(m_UpgradeBtn, UpgradeTool);
         UpdateInventoryVisual(true);
     }
     public void UpdateCoin(int coin)
@@ -100,14 +104,15 @@ public class GameUI : MonoBehaviour, IGameUI
                 continue;
             }
             newItem.SetActive(true);
+            Item item = sellList[i].Item;
+            int stack = (int)Math.Floor(sellList[i].StackSize);
+
             Vector3 pos = newItem.transform.GetComponent<RectTransform>().anchoredPosition;
             newItem.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, pos.y + (-70*i), 0);
             Sprite iconSprite = Resources.Load<Sprite>(sellList[i].Item.IconPath);
             newItem.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
-            newItem.transform.Find("Bg/Num").GetComponent<TMP_Text>().text = sellList[i].StackSize.ToString();
-
-            Item item = sellList[i].Item;
-            int stack = sellList[i].StackSize;
+            newItem.transform.Find("Bg/Num").GetComponent<TMP_Text>().text = stack.ToString();
+            
 
             Button buttonSell = newItem.transform.Find("Sell").GetComponent<Button>();
             buttonSell.transform.Find("Price").GetComponent<TMP_Text>().text = item.SellPrice.ToString();
@@ -208,9 +213,17 @@ public class GameUI : MonoBehaviour, IGameUI
                 if (entry.Item != null)
                 {
                     icon.sprite = Resources.Load<Sprite>(entry.Item.IconPath);
-                    if (entry.StackSize > 1)
+                    switch (entry.Item.Type)
                     {
-                        text = entry.StackSize.ToString();
+                        case ItemType.SeedBag:
+                        case ItemType.Animal:
+                            text = entry.StackSize.ToString();
+                            break;
+                        case ItemType.Product:
+                            text = entry.StackSize.ToString("0.0");
+                            break;
+                        default:
+                            break;
                     }
                 }
                 icon.gameObject.SetActive(entry.Item != null);
@@ -300,6 +313,19 @@ public class GameUI : MonoBehaviour, IGameUI
         int idle = GameManager.Instance.WorkerMgr.GetIdleWorkersCount();
         int total = GameManager.Instance.WorkerMgr.Workers.Count;
         m_IdleWorkers.text = idle + "/" + total;
+    }
+    private void UpgradeTool()
+    {
+        if (GameManager.Instance.Coin < 500)
+        {
+            return;
+        }
+        GameManager.Instance.AddCoin(-500);
+        GameManager.Instance.UpgradeTool();
+    }
+    public void UpdateToolLevel()
+    {
+        m_ToolLevel.text = string.Format("Lv.{0}", GameManager.Instance.ToolLevel.ToString());
     }
     public void ShowGameOver()
     {
