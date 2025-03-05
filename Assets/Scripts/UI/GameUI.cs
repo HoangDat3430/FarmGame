@@ -15,13 +15,13 @@ public class GameUI : MonoBehaviour, IGameUI
     private Transform buyPanel;
     private Transform inventoryPanel;
     private Transform farmPanel;
+    private Transform m_GameOverPanel;
 
     private TMP_Text m_CoinText;
     private TMP_Text m_IdleWorkers;
     private TMP_Text m_ToolLevel;
     private GameObject m_Store;
     private GameObject m_FarmList;
-    private GameObject m_GameOverPanel;
 
     private Button m_SellBtn;
     private Button m_BuyBtn;
@@ -30,6 +30,7 @@ public class GameUI : MonoBehaviour, IGameUI
     private Button m_CloseFarmListBtn;
     private Button m_EmployBtn;
     private Button m_UpgradeBtn;
+    private Button m_ExitBtn;
 
     private void Awake()
     {
@@ -41,6 +42,7 @@ public class GameUI : MonoBehaviour, IGameUI
         buyPanel = transform.Find("Store/ScrollView/Viewport/Buy");
         inventoryPanel = transform.Find("Inventory");
         farmPanel = transform.Find("FarmList/ScrollView/Viewport");
+        m_GameOverPanel = transform.Find("Victory");
 
         m_CoinText = transform.Find("Coin").GetComponent<TMP_Text>();
         m_IdleWorkers = transform.Find("Workers").GetComponent<TMP_Text>();
@@ -54,6 +56,7 @@ public class GameUI : MonoBehaviour, IGameUI
         m_CloseFarmListBtn = transform.Find("FarmList/CloseBtn").GetComponent<Button>();
         m_EmployBtn = transform.Find("EmployWorker").GetComponent<Button>();
         m_UpgradeBtn = transform.Find("UpgradeTool").GetComponent<Button>();
+        m_ExitBtn = transform.Find("Victory/Exit").GetComponent<Button>();
     }
     private void Start()
     {
@@ -64,11 +67,16 @@ public class GameUI : MonoBehaviour, IGameUI
         RegisterButtonEvent(m_CloseFarmListBtn, CloseLandList);
         RegisterButtonEvent(m_EmployBtn, EmployWorker);
         RegisterButtonEvent(m_UpgradeBtn, UpgradeTool);
+        RegisterButtonEvent(m_ExitBtn, ExitGame);
         UpdateInventoryVisual(true);
     }
     public void UpdateCoin()
     {
         m_CoinText.text = GameManager.Instance.Player.Coins.ToString();
+        if(GameManager.Instance.Player.Coins >= 10000)
+        {
+            ShowGameOver();
+        }
     }
     public void ShowMarket()
     {
@@ -97,7 +105,7 @@ public class GameUI : MonoBehaviour, IGameUI
         for(int i = 0; i < sellPanel.childCount; i++)
         {
             GameObject newItem = sellPanel.GetChild(i).gameObject;
-            newItem.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -50, 0);
+            newItem.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -60, 0);
             if(i >= sellList.Count)
             {
                 newItem.SetActive(false);
@@ -108,7 +116,7 @@ public class GameUI : MonoBehaviour, IGameUI
             int stack = (int)Math.Floor(sellList[i].StackSize);
 
             Vector3 pos = newItem.transform.GetComponent<RectTransform>().anchoredPosition;
-            newItem.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, pos.y + (-70*i), 0);
+            newItem.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, pos.y + (-100*i), 0);
             Sprite iconSprite = Resources.Load<Sprite>(sellList[i].Item.IconPath);
             newItem.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
             newItem.transform.Find("Bg/Num").GetComponent<TMP_Text>().text = stack.ToString();
@@ -155,7 +163,7 @@ public class GameUI : MonoBehaviour, IGameUI
         for (int i = 0; i < buyPanel.childCount; i++)
         {
             GameObject item = buyPanel.GetChild(i).gameObject;
-            item.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -50, 0);
+            item.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -60, 0);
             if (i >= canBuyList.Count)
             {
                 item.SetActive(false);
@@ -163,7 +171,7 @@ public class GameUI : MonoBehaviour, IGameUI
             }
             item.SetActive(true);
             Vector3 pos = item.transform.GetComponent<RectTransform>().anchoredPosition;
-            item.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, pos.y + (-70 * i), 0);
+            item.transform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, pos.y + (-100 * i), 0);
 
             Sprite iconSprite = Resources.Load<Sprite>(canBuyList[i].IconPath);
             item.transform.Find("Bg/Icon").GetComponent<Image>().sprite = iconSprite;
@@ -328,6 +336,11 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     public void ShowGameOver()
     {
-        m_GameOverPanel.SetActive(true);
+        m_GameOverPanel.gameObject.SetActive(true);
+        Time.timeScale = 0;
+    }
+    private void ExitGame()
+    {
+        Application.Quit();
     }
 }
