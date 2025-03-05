@@ -66,9 +66,9 @@ public class GameUI : MonoBehaviour, IGameUI
         RegisterButtonEvent(m_UpgradeBtn, UpgradeTool);
         UpdateInventoryVisual(true);
     }
-    public void UpdateCoin(int coin)
+    public void UpdateCoin()
     {
-        m_CoinText.text = coin.ToString();
+        m_CoinText.text = GameManager.Instance.Player.Coins.ToString();
     }
     public void ShowMarket()
     {
@@ -186,13 +186,13 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void BuyItem(Item newItem, int count)
     {
-        if(GameManager.Instance.Player.CanFitInInventory(newItem, count) && GameManager.Instance.Player.Coin >= newItem.BuyPrice * count)
+        if(GameManager.Instance.Player.CanFitInInventory(newItem, count) && GameManager.Instance.Player.Coins >= newItem.BuyPrice * count)
         {
             for(int i = 0; i < count; i++)
             {
                 if (GameManager.Instance.Player.AddItem(newItem))
                 {
-                    GameManager.Instance.AddCoin(-newItem.BuyPrice);
+                    GameManager.Instance.Player.AddCoin(-newItem.BuyPrice);
                 }
                 UpdateInventoryVisual(true);
             }
@@ -285,11 +285,11 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void BuyFarm()
     {
-        if(GameManager.Instance.Player.Coin < 500)
+        if(GameManager.Instance.Player.Coins < 500)
         {
             return;
         }
-        GameManager.Instance.AddCoin(-500);
+        GameManager.Instance.Player.AddCoin(-500);
         GameManager.Instance.TerrainMgr.UnlockFields(1);
         ShowLandList();
     }
@@ -299,12 +299,12 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void EmployWorker()
     {
-        if (GameManager.Instance.Player.Coin < 500)
+        if (GameManager.Instance.Player.Coins < 500)
         {
             return;
         }
 
-        GameManager.Instance.AddCoin(-500);
+        GameManager.Instance.Player.AddCoin(-500);
         GameManager.Instance.WorkerMgr.EmployWorker();
         UpdateIdleWorkers();
     }
@@ -316,12 +316,11 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void UpgradeTool()
     {
-        if (GameManager.Instance.Player.Coin < 500)
+        if (GameManager.Instance.Player.Coins < 500)
         {
             return;
         }
-        GameManager.Instance.AddCoin(-500);
-        GameManager.Instance.UpgradeTool();
+        GameManager.Instance.Player.UpgradeTool();
     }
     public void UpdateToolLevel()
     {

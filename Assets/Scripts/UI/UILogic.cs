@@ -1,6 +1,6 @@
 ﻿public interface IGameUI
 {
-    void UpdateCoin(int score);
+    void UpdateCoin();
     void ShowMarket();
     void UpdateInventoryVisual(bool bForce);
     void ShowLandList();
@@ -12,17 +12,15 @@
 public class UIHandler
 {
     private IGameUI _gameUI;
-    private int coin = 0;
 
     public UIHandler(IGameUI gameUI)
     {
         _gameUI = gameUI;
     }
 
-    public void AddCoin(int amount)
+    public void UpdateCoin()
     {
-        coin += amount;
-        _gameUI.UpdateCoin(coin);
+        _gameUI.UpdateCoin();
     }
     public void ShowMarket()
     {

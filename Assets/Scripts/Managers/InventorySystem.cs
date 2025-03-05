@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 namespace Farm
 {
@@ -30,6 +31,10 @@ namespace Farm
             {
                 Entries[i] = new InventoryEntry();
             }
+            EquippedItemIdx = 0;
+        }
+        public void SetStartingInventory()
+        {
             Entries[0].Item = new Hoe();
             Entries[0].StackSize = 1;
             Entries[1].Item = new Basket();
@@ -48,7 +53,6 @@ namespace Farm
             Entries[7].StackSize = 10;
             Entries[8].Item = new Product(11);
             Entries[8].StackSize = 10;
-            EquippedItemIdx = 0;
         }
 
         //return true if the object could be used
@@ -168,7 +172,7 @@ namespace Farm
                 if (entry.Item != null && entry.Item == item)
                 {
                     entry.StackSize -= count;
-                    GameManager.Instance.AddCoin(item.SellPrice * count);
+                    GameManager.Instance.Player.AddCoin(item.SellPrice * count);
                     if(entry.StackSize == 0)
                     {
                         entry.Item = null;
@@ -190,6 +194,35 @@ namespace Farm
                     break;
             }
         }
+        private Item CreateItem(int itemID, ItemType type)
+        {
+            switch (type)
+            {
+                case ItemType.Tool:
+                    if (itemID == 1)
+                    {
+                        return new Basket();
+                    }
+                    else if (itemID == 2)
+                    {
+                        return new Hoe();
+                    }
+                    else if (itemID == 3)
+                    {
+                        return new WaterCan();
+                    }
+                    break;
+                case ItemType.SeedBag:
+                    return new SeedBag(itemID);
+                case ItemType.Animal:
+                    return new Animal(itemID);
+                case ItemType.Product:
+                    return new Product(itemID);
+                default:
+                    break;
+            }
+            return null;
+        }
         public void Save(ref List<InventorySaveData> data)
         {
             foreach (var entry in Entries)
@@ -199,7 +232,8 @@ namespace Farm
                     data.Add(new InventorySaveData()
                     {
                         Amount = entry.StackSize,
-                        Item = entry.Item
+                        ItemID = entry.Item.ItemID,
+                        ItemType = (int)entry.Item.Type
                     });
                 }
                 else
@@ -212,11 +246,13 @@ namespace Farm
         // Load the content in the given list inside that inventory.
         public void Load(List<InventorySaveData> data)
         {
+            Init();
             for (int i = 0; i < data.Count; ++i)
             {
-                if (data[i] != null)
+                if (data[i].Amount != 0)
                 {
-                    Entries[i].Item = data[i].Item;
+                    Item item = CreateItem(data[i].ItemID, (ItemType)data[i].ItemType);
+                    Entries[i].Item = item;
                     Entries[i].StackSize = data[i].Amount;
                 }
                 else
@@ -231,7 +267,8 @@ namespace Farm
     public class InventorySaveData
     {
         public float Amount;
-        public Item Item;
+        public int ItemID;
+        public int ItemType;
     }
 }
     

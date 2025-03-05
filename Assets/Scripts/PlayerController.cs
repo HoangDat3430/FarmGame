@@ -17,10 +17,6 @@ namespace Farm
         public int Coins
         {
             get => m_Coins;
-            set
-            {
-                m_Coins = value;
-            }
         }
 
         public InventorySystem Inventory => m_Inventory;
@@ -30,7 +26,7 @@ namespace Farm
         //the UI is updated, but is tagged as SerializedField so it appear in the editor so designer can set the starting
         //amount of coins
         [SerializeField]
-        private int m_Coins = 10;
+        private int m_Coins;
 
         [SerializeField]
         private InventorySystem m_Inventory;
@@ -60,16 +56,7 @@ namespace Farm
         private int m_DirXHash = Animator.StringToHash("DirX");
         private int m_DirYHash = Animator.StringToHash("DirY");
         private int m_SpeedHash = Animator.StringToHash("Speed");
-        private int m_Coin;
         private int m_ToolLevel = 1;
-
-        public int Coin
-        {
-            get
-            {
-                return m_Coin;
-            }
-        }
 
         public int ToolLevel
         {
@@ -80,12 +67,6 @@ namespace Farm
         }
         void Awake()
         {
-            if (GameManager.Instance.Player != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            
             m_Rigidbody = GetComponent<Rigidbody2D>();
             m_Animator = GetComponentInChildren<Animator>();
             m_TargetMarker = Target.GetComponent<TargetMarker>();
@@ -96,8 +77,8 @@ namespace Farm
             gameObject.transform.SetParent(null);
             
             GameManager.Instance.Player = this;
+            GameManager.Instance.SetCameraFollow(transform);
             DontDestroyOnLoad(gameObject);
-            m_Inventory.Init();
         }
 
         void Start()
@@ -380,12 +361,13 @@ namespace Farm
         public void AddCoin(int amount)
         {
             m_Coins += amount;
-           GameManager.Instance.AddCoin(amount);
+            GameManager.Instance.UpdateCoin();
         }
         public void UpgradeTool()
         {
+            AddCoin(-500);
             m_ToolLevel++;
-            GameManager.Instance.UpgradeTool();
+            GameManager.Instance.UpdateToolLevel();
         }
         public void Save(ref PlayerSaveData data)
         {
@@ -402,6 +384,8 @@ namespace Farm
             m_Inventory.Load(data.Inventory);
             m_ToolLevel = data.ToolLevel;
             m_Rigidbody.position = data.Position;
+            GameManager.Instance.UpdateCoin();
+            GameManager.Instance.UpdateToolLevel();
         }
     }
     class ItemInstance

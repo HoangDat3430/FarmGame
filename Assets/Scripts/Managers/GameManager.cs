@@ -9,7 +9,7 @@ namespace Farm
     /// The GameManager is the entry point to all the game system. It's execution order is set very low to make sure
     /// its Awake function is called as early as possible so the instance if valid on other Scripts. 
     /// </summary>
-    //[DefaultExecutionOrder(-9999)]
+    [DefaultExecutionOrder(-9999)]
     public class GameManager : MonoBehaviour
     {
         private static GameManager s_Instance;
@@ -74,9 +74,6 @@ namespace Farm
 
             m_IsTicking = true;
             
-            SpawnPlayer();
-            m_CurrentTimeOfTheDay = StartingTime;
-            
             //we need to ensure that we don't have a day length at 0, otherwise we will get stuck into infinite loop in update
             //(and a day with 0 length makes no sense)
             if (DayDurationInSeconds <= 0.0f)
@@ -91,10 +88,23 @@ namespace Farm
             m_CurrentTimeOfTheDay = StartingTime;
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
             uiLogic = new UIHandler(gameUI);
-            AddCoin(5000);
-            uiLogic.UpdateToolLevel();
-            uiLogic.UpdateIdleWorkers();
-            TerrainMgr.UnlockFields(3);
+            SaveSystem.SaveData saveData = SaveSystem.Load();
+            if(saveData != null)
+            {
+                Player.Load(saveData.PlayerData);
+                TerrainMgr.Load(saveData.TerrainData);
+                WorkerMgr.Load(saveData.WorkerSaveData);
+            }
+            else
+            {
+                Player.Inventory.Init();
+                Player.Inventory.SetStartingInventory();
+                TerrainMgr.UnlockFields(3);
+            }
+            UpdateCoin();
+            UpdateInventoryVisual(true);
+            UpdateIdleWorkers();
+            UpdateToolLevel();
         }
 
 #if UNITY_EDITOR
@@ -124,18 +134,12 @@ namespace Farm
             m_ItemConfigs.ReadFile("Data/ItemList.csv");
             m_CropConfigs.ReadFile("Data/CropList.csv");
         }
-        private void SpawnPlayer()
+        public void SetCameraFollow(Transform player)
         {
-            if(Player == null)
-            {
-                Instantiate(Resources.Load<PlayerController>("Prefabs/Character"));
-                var playerTransform = Instance.Player.transform;
-                playerTransform.position = transform.position;
-
-                Instance.MainCamera.Follow = playerTransform;
-                Instance.MainCamera.LookAt = playerTransform;
-                Instance.MainCamera.ForceCameraPosition(playerTransform.position, Quaternion.identity);
-            }
+            player.position = transform.position;
+            Instance.MainCamera.Follow = player;
+            Instance.MainCamera.LookAt = player;
+            Instance.MainCamera.ForceCameraPosition(player.position, Quaternion.identity);
         }
         public List<ItemList.RowData> ItemsToBuy()
         {
@@ -153,9 +157,9 @@ namespace Farm
         {
             uiLogic.ShowMarket();
         }
-        public void AddCoin(int amount)
+        public void UpdateCoin()
         {
-            uiLogic.AddCoin(amount);
+            uiLogic.UpdateCoin();
         }
         public void OpenFarmStore()
         {
@@ -169,7 +173,7 @@ namespace Farm
         {
             uiLogic.UpdateIdleWorkers();
         }
-        public void UpgradeTool()
+        public void UpdateToolLevel()
         {
             uiLogic.UpdateToolLevel();
         }
@@ -184,6 +188,10 @@ namespace Farm
         public CropList.RowData GetCropByCropID(int cropId)
         {
             return m_CropConfigs.GetByCropId(cropId);
+        }
+        private void OnApplicationQuit()
+        {
+            SaveSystem.Save();
         }
     }
 }

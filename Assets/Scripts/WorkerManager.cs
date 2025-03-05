@@ -59,4 +59,27 @@ public class WorkerManager : MonoBehaviour
         }
         return count;
     }
+    public void Save(ref WorkerMgrSaveData data)
+    {
+        data.workerSaveDatas = new List<WorkerSaveData>();
+        for (int i = 0; i < m_Workers.Count; i++)
+        {
+            data.workerSaveDatas.Add(m_Workers[i].Save());
+        }
+        data.WorkerCount = m_Workers.Count;
+    }
+    public void Load(WorkerMgrSaveData data)
+    {
+        for(int i = 0; i < data.WorkerCount; i++)
+        {
+            EmployWorker();
+            m_Workers[i].Load(data.workerSaveDatas[i]);
+        }
+    }
+}
+[System.Serializable]
+public struct WorkerMgrSaveData
+{
+    public List<WorkerSaveData> workerSaveDatas;
+    public int WorkerCount;
 }

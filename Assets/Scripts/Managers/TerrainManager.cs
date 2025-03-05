@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static Farm.TerrainManager;
 
 
 namespace Farm
@@ -32,6 +33,7 @@ namespace Farm
                 public float GrowthTimer;
                 public int HarvestCount;
                 public float DyingTimer;
+                public bool HasAnimal;
             }
 
             public Crop GrowingCrop = null;
@@ -82,6 +84,7 @@ namespace Farm
                 data.GrowthRatio = GrowthRatio;
                 data.GrowthTimer = GrowthTimer;
                 data.HarvestCount = HarvestCount;
+                data.HasAnimal = Animal != null;
             }
 
             public void Load(CropSaveData data)
@@ -311,15 +314,19 @@ namespace Farm
 
                 if (i==0)//Graze only 1 animal in a field, cells have the same crop data with each other.
                 {
-                    ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cattleToGraze.CropID);
-                    GameObject animalPrefab = Resources.Load<GameObject>(rowData.PrefabPath);
-                    GameObject animal = Instantiate(animalPrefab, target, Quaternion.identity);
-                    animal.GetComponent<BasicAnimalMovement>().SetField(field);
-                    cropData.Animal = animal;
+                    cropData.Animal = SpawnAnimalPrefab(cattleToGraze.CropID, target, field);
                 }
                 TillAt(field[i]);
                 m_CropData.Add(field[i], cropData);
             }
+        }
+        private GameObject SpawnAnimalPrefab(int cropId, Vector3Int target, List<Vector3Int> field)
+        {
+            ItemList.RowData rowData = GameManager.Instance.GetItemByCropID(cropId);
+            GameObject animalPrefab = Resources.Load<GameObject>(rowData.PrefabPath);
+            GameObject animal = Instantiate(animalPrefab, target, Quaternion.identity);
+            animal.GetComponent<BasicAnimalMovement>().SetField(field);
+            return animal;
         }
         public void WaterAt(Vector3Int target)
         {
@@ -469,7 +476,7 @@ namespace Farm
         {
             m_WaitingToHarvestFields.Remove(fieldId);
         }
-        public void Save(ref TerrainDataSave data)
+        public void Save(ref TerrainSaveData data)
         {
             data.GroundDatas = new List<GroundData>();
             data.GroundDataPositions = new List<Vector3Int>();
@@ -490,14 +497,11 @@ namespace Farm
                 data.CropDatas.Add(saveData);
             }
 
-            foreach (var Lock in m_RemainingLock)
-            {
-                data.remainingLock.Add(Lock.Key) ;
-            }
+            data.OpenedFields = m_FieldGroups.Count - m_RemainingLock.Count;
             data.waitingToHarvestFields = m_WaitingToHarvestFields;
         }
 
-        public void Load(TerrainDataSave data)
+        public void Load(TerrainSaveData data)
         {
             m_GroundData = new Dictionary<Vector3Int, GroundData>();
             for (int i = 0; i < data.GroundDatas.Count; ++i)
@@ -515,28 +519,28 @@ namespace Farm
             {
                 CropData newData = new CropData();
                 newData.Load(data.CropDatas[i]);
-
+                if (data.CropDatas[i].HasAnimal)
+                {
+                    GameObject animal = SpawnAnimalPrefab(data.CropDatas[i].CropId, data.CropDataPositions[i], m_FieldGroups[GetFieldIdByTile(data.CropDataPositions[i])]);
+                    newData.Animal = animal;
+                }
                 m_CropData.Add(data.CropDataPositions[i], newData);
                 UpdateCropVisual(data.CropDataPositions[i]);
             }
-            
-            for(int i = 0; i < data.remainingLock.Count; i++)
-            {
-                m_RemainingLock.Add(data.remainingLock[i], Instantiate(Lock, m_FieldGroups[data.remainingLock[i]][3], Quaternion.identity));
-            }
+            UnlockFields(data.OpenedFields);
             m_WaitingToHarvestFields = data.waitingToHarvestFields;
         }
     }
     [Serializable]
-    public struct TerrainDataSave
+    public struct TerrainSaveData
     {
         public List<Vector3Int> GroundDataPositions;
-        public List<TerrainManager.GroundData> GroundDatas;
+        public List<GroundData> GroundDatas;
 
         public List<Vector3Int> CropDataPositions;
-        public List<TerrainManager.CropData.CropSaveData> CropDatas;
+        public List<CropData.CropSaveData> CropDatas;
 
-        public List<int> remainingLock;
+        public int OpenedFields;
         public List<int> waitingToHarvestFields;
     }
 }

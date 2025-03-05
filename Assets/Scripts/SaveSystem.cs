@@ -11,32 +11,35 @@ namespace Farm
         private static SaveData s_CurrentData = new SaveData();
         
         [System.Serializable]
-        public struct SaveData
+        public class SaveData
         {
             public PlayerSaveData PlayerData;
-            public TerrainDataSave TerrainData;
+            public TerrainSaveData TerrainData;
+            public WorkerMgrSaveData WorkerSaveData;
         }
 
         public static void Save()
         {
             GameManager.Instance.Player.Save(ref s_CurrentData.PlayerData);
             GameManager.Instance.TerrainMgr.Save(ref s_CurrentData.TerrainData);
+            GameManager.Instance.WorkerMgr.Save(ref s_CurrentData.WorkerSaveData);
 
             string savefile = Application.persistentDataPath + "/save.sav";
             File.WriteAllText(savefile, JsonUtility.ToJson(s_CurrentData));
-            Debug.LogError("Saved");
         }
 
-        public static void Load()
+        public static SaveData Load()
         {
             string savefile = Application.persistentDataPath + "/save.sav";
+            if (!File.Exists(savefile)) { return null; }
+
             string content = File.ReadAllText(savefile);
 
             s_CurrentData = JsonUtility.FromJson<SaveData>(content);
-            
-            SceneManager.sceneLoaded += SceneLoaded;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
-            Debug.LogError("Loaded");
+            return s_CurrentData;
+
+            //SceneManager.sceneLoaded += SceneLoaded;
+            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
         }
 
         static void SceneLoaded(Scene scene, LoadSceneMode mode)
