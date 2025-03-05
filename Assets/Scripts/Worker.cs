@@ -78,7 +78,7 @@ namespace Farm
 
                 if (product != null)
                 {
-                    float toolBoost = (float)(GameManager.Instance.ToolLevel - 1) / 10;
+                    float toolBoost = (float)(GameManager.Instance.Player.ToolLevel - 1) / 10;
                     float productivityBoost = product.ProductPerHarvest + toolBoost;
                     GameManager.Instance.Player.AddItem(product.Product, productivityBoost);
                 }

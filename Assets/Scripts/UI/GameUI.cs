@@ -186,7 +186,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void BuyItem(Item newItem, int count)
     {
-        if(GameManager.Instance.Player.CanFitInInventory(newItem, count) && GameManager.Instance.Coin >= newItem.BuyPrice * count)
+        if(GameManager.Instance.Player.CanFitInInventory(newItem, count) && GameManager.Instance.Player.Coin >= newItem.BuyPrice * count)
         {
             for(int i = 0; i < count; i++)
             {
@@ -285,7 +285,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void BuyFarm()
     {
-        if(GameManager.Instance.Coin < 500)
+        if(GameManager.Instance.Player.Coin < 500)
         {
             return;
         }
@@ -299,7 +299,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void EmployWorker()
     {
-        if (GameManager.Instance.Coin < 500)
+        if (GameManager.Instance.Player.Coin < 500)
         {
             return;
         }
@@ -316,7 +316,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void UpgradeTool()
     {
-        if (GameManager.Instance.Coin < 500)
+        if (GameManager.Instance.Player.Coin < 500)
         {
             return;
         }
@@ -325,7 +325,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     public void UpdateToolLevel()
     {
-        m_ToolLevel.text = string.Format("Lv.{0}", GameManager.Instance.ToolLevel.ToString());
+        m_ToolLevel.text = string.Format("Lv.{0}", GameManager.Instance.Player.ToolLevel.ToString());
     }
     public void ShowGameOver()
     {

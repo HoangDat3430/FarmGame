@@ -66,22 +66,6 @@ namespace Farm
 
         private UIHandler uiLogic;
 
-        private int m_Coin;
-        private int m_ToolLevel = 1;
-        public int Coin
-        {
-            get
-            {
-                return m_Coin;
-            }
-        }
-        public int ToolLevel
-        {
-            get
-            {
-                return m_ToolLevel;
-            }
-        }
         private void Awake()
         {
             s_Instance = this;
@@ -171,7 +155,6 @@ namespace Farm
         }
         public void AddCoin(int amount)
         {
-            m_Coin += amount;
             uiLogic.AddCoin(amount);
         }
         public void OpenFarmStore()
@@ -188,7 +171,6 @@ namespace Farm
         }
         public void UpgradeTool()
         {
-            m_ToolLevel++;
             uiLogic.UpdateToolLevel();
         }
         public ItemList.RowData GetItemByItemID(int itemId)

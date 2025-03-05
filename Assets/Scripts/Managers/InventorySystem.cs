@@ -1,16 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEditorInternal.Profiling.Memory.Experimental;
-using Unity.VisualScripting;
-
-
-
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.UIElements;
-#endif
 
 namespace Farm
 {
@@ -200,5 +190,48 @@ namespace Farm
                     break;
             }
         }
+        public void Save(ref List<InventorySaveData> data)
+        {
+            foreach (var entry in Entries)
+            {
+                if (entry.Item != null)
+                {
+                    data.Add(new InventorySaveData()
+                    {
+                        Amount = entry.StackSize,
+                        Item = entry.Item
+                    });
+                }
+                else
+                {
+                    data.Add(null);
+                }
+            }
+        }
+
+        // Load the content in the given list inside that inventory.
+        public void Load(List<InventorySaveData> data)
+        {
+            for (int i = 0; i < data.Count; ++i)
+            {
+                if (data[i] != null)
+                {
+                    Entries[i].Item = data[i].Item;
+                    Entries[i].StackSize = data[i].Amount;
+                }
+                else
+                {
+                    Entries[i].Item = null;
+                    Entries[i].StackSize = 0;
+                }
+            }
+        }
+    }
+    [Serializable]
+    public class InventorySaveData
+    {
+        public float Amount;
+        public Item Item;
     }
 }
+    

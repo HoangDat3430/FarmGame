@@ -2,12 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
-using UnityEngine.VFX;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.Rendering.DebugUI;
 
 
 namespace Farm
@@ -18,7 +13,7 @@ namespace Farm
     /// </summary>
     public class TerrainManager : MonoBehaviour
     {
-        [System.Serializable]
+        [Serializable]
         public class GroundData
         {
             public const float WaterDuration = 60 * 1.0f;
@@ -29,9 +24,9 @@ namespace Farm
         public class CropData
         {
             [Serializable]
-            public struct SaveData
+            public struct CropSaveData
             {
-                public string CropId;
+                public int CropId;
                 public int Stage;
                 public float GrowthRatio;
                 public float GrowthTimer;
@@ -77,8 +72,26 @@ namespace Farm
                 {
                     return null;
                 }
-                
                 return crop;
+            }
+            public void Save(ref CropSaveData data)
+            {
+                data.Stage = CurrentGrowthStage;
+                data.CropId = GrowingCrop.Key;
+                data.DyingTimer = DyingTimer;
+                data.GrowthRatio = GrowthRatio;
+                data.GrowthTimer = GrowthTimer;
+                data.HarvestCount = HarvestCount;
+            }
+
+            public void Load(CropSaveData data)
+            {
+                CurrentGrowthStage = data.Stage;
+                GrowingCrop = new Crop(data.CropId);
+                DyingTimer = data.DyingTimer;
+                GrowthRatio = data.GrowthRatio;
+                GrowthTimer = data.GrowthTimer;
+                HarvestCount = data.HarvestCount;
             }
         }
 
@@ -456,5 +469,74 @@ namespace Farm
         {
             m_WaitingToHarvestFields.Remove(fieldId);
         }
+        public void Save(ref TerrainDataSave data)
+        {
+            data.GroundDatas = new List<GroundData>();
+            data.GroundDataPositions = new List<Vector3Int>();
+            foreach (var groundData in m_GroundData)
+            {
+                data.GroundDataPositions.Add(groundData.Key);
+                data.GroundDatas.Add(groundData.Value);
+            }
+
+            data.CropDatas = new List<CropData.CropSaveData>();
+            data.CropDataPositions = new List<Vector3Int>();
+            foreach (var cropData in m_CropData)
+            {
+                data.CropDataPositions.Add(cropData.Key);
+
+                var saveData = new CropData.CropSaveData();
+                cropData.Value.Save(ref saveData);
+                data.CropDatas.Add(saveData);
+            }
+
+            foreach (var Lock in m_RemainingLock)
+            {
+                data.remainingLock.Add(Lock.Key) ;
+            }
+            data.waitingToHarvestFields = m_WaitingToHarvestFields;
+        }
+
+        public void Load(TerrainDataSave data)
+        {
+            m_GroundData = new Dictionary<Vector3Int, GroundData>();
+            for (int i = 0; i < data.GroundDatas.Count; ++i)
+            {
+                var pos = data.GroundDataPositions[i];
+                m_GroundData.Add(pos, data.GroundDatas[i]);
+
+                GroundTilemap.SetTile(pos, TilledTile);
+
+                WaterTilemap.SetTile(data.GroundDataPositions[i], data.GroundDatas[i].WaterTimer > 0.0f ? WateredTile : null);
+            }
+
+            m_CropData = new Dictionary<Vector3Int, CropData>();
+            for (int i = 0; i < data.CropDatas.Count; ++i)
+            {
+                CropData newData = new CropData();
+                newData.Load(data.CropDatas[i]);
+
+                m_CropData.Add(data.CropDataPositions[i], newData);
+                UpdateCropVisual(data.CropDataPositions[i]);
+            }
+            
+            for(int i = 0; i < data.remainingLock.Count; i++)
+            {
+                m_RemainingLock.Add(data.remainingLock[i], Instantiate(Lock, m_FieldGroups[data.remainingLock[i]][3], Quaternion.identity));
+            }
+            m_WaitingToHarvestFields = data.waitingToHarvestFields;
+        }
+    }
+    [Serializable]
+    public struct TerrainDataSave
+    {
+        public List<Vector3Int> GroundDataPositions;
+        public List<TerrainManager.GroundData> GroundDatas;
+
+        public List<Vector3Int> CropDataPositions;
+        public List<TerrainManager.CropData.CropSaveData> CropDatas;
+
+        public List<int> remainingLock;
+        public List<int> waitingToHarvestFields;
     }
 }

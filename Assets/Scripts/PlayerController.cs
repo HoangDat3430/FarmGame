@@ -60,7 +60,24 @@ namespace Farm
         private int m_DirXHash = Animator.StringToHash("DirX");
         private int m_DirYHash = Animator.StringToHash("DirY");
         private int m_SpeedHash = Animator.StringToHash("Speed");
+        private int m_Coin;
+        private int m_ToolLevel = 1;
 
+        public int Coin
+        {
+            get
+            {
+                return m_Coin;
+            }
+        }
+
+        public int ToolLevel
+        {
+            get
+            {
+                return m_ToolLevel;
+            }
+        }
         void Awake()
         {
             if (GameManager.Instance.Player != null)
@@ -183,6 +200,14 @@ namespace Farm
                 {
                     m_TargetMarker.Hide();
                 }
+            }
+            if (Keyboard.current.f5Key.wasPressedThisFrame)
+            {
+                SaveSystem.Save();
+            }
+            else if (Keyboard.current.f9Key.wasPressedThisFrame)
+            {
+                SaveSystem.Load();
             }
         }
 
@@ -352,12 +377,45 @@ namespace Farm
                 };
             }
         }
-    }
+        public void AddCoin(int amount)
+        {
+            m_Coins += amount;
+           GameManager.Instance.AddCoin(amount);
+        }
+        public void UpgradeTool()
+        {
+            m_ToolLevel++;
+            GameManager.Instance.UpgradeTool();
+        }
+        public void Save(ref PlayerSaveData data)
+        {
+            data.Position = m_Rigidbody.position;
+            data.Coins = m_Coins;
+            data.ToolLevel = m_ToolLevel;
+            data.Inventory = new List<InventorySaveData>();
+            m_Inventory.Save(ref data.Inventory);
+        }
 
+        public void Load(PlayerSaveData data)
+        {
+            m_Coins = data.Coins;
+            m_Inventory.Load(data.Inventory);
+            m_ToolLevel = data.ToolLevel;
+            m_Rigidbody.position = data.Position;
+        }
+    }
     class ItemInstance
     {
         public GameObject Instance;
         public Animator Animator;
         public int AnimatorHash;
+    }
+    [System.Serializable]
+    public struct PlayerSaveData
+    {
+        public Vector3 Position;
+        public int ToolLevel;
+        public int Coins;
+        public List<InventorySaveData> Inventory;
     }
 }
