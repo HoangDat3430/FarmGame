@@ -100,6 +100,7 @@ namespace Farm
                 Player.Inventory.Init();
                 Player.Inventory.SetStartingInventory();
                 TerrainMgr.UnlockFields(3);
+                WorkerMgr.EmployWorker();
             }
             UpdateCoin();
             UpdateInventoryVisual(true);

@@ -46,7 +46,7 @@ namespace Farm
             Entries[4].Item = new SeedBag(8);
             Entries[4].StackSize = 10;
             Entries[5].Item = new Animal(10);
-            Entries[5].StackSize = 1;
+            Entries[5].StackSize = 2;
         }
 
         //return true if the object could be used

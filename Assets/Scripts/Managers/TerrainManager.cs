@@ -312,7 +312,7 @@ namespace Farm
                 cropData.GrowthTimer = 0.0f;
                 cropData.CurrentGrowthStage = 0;
 
-                if (i==0)//Graze only 1 animal in a field, cells have the same crop data with each other.
+                if (i==0 && cropData.Animal == null)//Graze only 1 animal in a field, cells have the same crop data with each other.
                 {
                     cropData.Animal = SpawnAnimalPrefab(cattleToGraze.CropID, target, field);
                 }
