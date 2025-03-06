@@ -320,7 +320,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void EmployWorker()
     {
-        if (GameManager.Instance.Player.Coins < 500)
+        if (GameManager.Instance.Player.Coins < 500 && GameManager.Instance.WorkerMgr.Workers.Count < 9)
         {
             return;
         }
@@ -337,7 +337,7 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     private void UpgradeTool()
     {
-        if (GameManager.Instance.Player.Coins < 500)
+        if (GameManager.Instance.Player.Coins < 500 && GameManager.Instance.Player.ToolLevel < 10)
         {
             return;
         }
