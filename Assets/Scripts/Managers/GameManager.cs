@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Farm
 {
@@ -86,7 +85,7 @@ namespace Farm
         private void Start()
         {
             m_CurrentTimeOfTheDay = StartingTime;
-            IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vào Logic
+            IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI vï¿½o Logic
             uiLogic = new UIHandler(gameUI);
             SaveSystem.SaveData saveData = SaveSystem.Load();
             if(saveData != null)

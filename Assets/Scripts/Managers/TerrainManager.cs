@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static Farm.TerrainManager;
@@ -136,7 +135,7 @@ namespace Farm
         void Awake()
         {
             GameManager.Instance.TerrainMgr = this;
-            transform.Find("Warehouse").AddComponent<WorkerManager>();
+            transform.Find("Warehouse").gameObject.AddComponent<WorkerManager>();
             GroupTilesByFields();
             InitFarmLands();
         }
