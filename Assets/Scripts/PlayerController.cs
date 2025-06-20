@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,8 +17,13 @@ namespace Farm
         public int Coins
         {
             get => m_Coins;
+            set
+            {
+                m_Coins = value;
+                OnCoinChanged?.Invoke(m_Coins);
+            }
         }
-
+        public Action<int> OnCoinChanged;
         public InventorySystem Inventory => m_Inventory;
         public Animator Animator => m_Animator;
 
@@ -359,14 +365,12 @@ namespace Farm
         }
         public void AddCoin(int amount)
         {
-            m_Coins += amount;
-            GameManager.Instance.UpdateCoin();
+            Coins += amount;
         }
         public void UpgradeTool()
         {
             AddCoin(-500);
             m_ToolLevel++;
-            GameManager.Instance.UpdateToolLevel();
         }
         public void Save(ref PlayerSaveData data)
         {
@@ -379,12 +383,10 @@ namespace Farm
 
         public void Load(PlayerSaveData data)
         {
-            m_Coins = data.Coins;
+            Coins = data.Coins;
             m_Inventory.Load(data.Inventory);
             m_ToolLevel = data.ToolLevel;
             m_Rigidbody.position = data.Position;
-            GameManager.Instance.UpdateCoin();
-            GameManager.Instance.UpdateToolLevel();
         }
     }
     class ItemInstance

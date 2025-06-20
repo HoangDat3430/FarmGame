@@ -101,10 +101,9 @@ namespace Farm
                 TerrainMgr.UnlockFields(3);
                 WorkerMgr.EmployWorker();
             }
-            UpdateCoin();
-            UpdateInventoryVisual(true);
-            UpdateIdleWorkers();
-            UpdateToolLevel();
+            // UpdateInventoryVisual(true);
+            // UpdateIdleWorkers();
+            // UpdateToolLevel();
         }
 
 #if UNITY_EDITOR
