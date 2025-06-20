@@ -24,8 +24,7 @@ namespace Farm
             }
         }
         public Action<int> OnCoinChanged;
-        public InventorySystem Inventory => m_Inventory;
-        public Animator Animator => m_Animator;
+        public InventoryHandler Inventory => m_Inventory;
 
         //This is private as we don't want to be able to set coins without going through the accessor above that ensure
         //the UI is updated, but is tagged as SerializedField so it appear in the editor so designer can set the starting
@@ -34,7 +33,7 @@ namespace Farm
         private int m_Coins;
 
         [SerializeField]
-        private InventorySystem m_Inventory;
+        private InventoryHandler m_Inventory;
         
         private Rigidbody2D m_Rigidbody;
 

@@ -13,4 +13,8 @@ public class FarmListView : UIPanelBase<FarmListView, FarmListHandler>
     {
         CloseBtn.onClick.AddListener(Hide);
     }
+    public void Hello()
+    {
+
+    }
 }

@@ -1,3 +1,4 @@
+using Farm;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,7 @@ public static class UIFactory
     {
         RegistryPanel<MainUI, MainUIHandler>("MainUI");
         RegistryPanel<FarmListView, FarmListHandler>("FarmList");
+        RegistryPanel<InventoryPanel, InventoryHandler>("InventoryPanel");
     }
     public static void RegistryPanel<TPanel, THandler>(string prefabName) 
         where TPanel : IUIPanelBase

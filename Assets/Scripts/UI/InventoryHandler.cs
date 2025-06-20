@@ -8,7 +8,7 @@ namespace Farm
     /// Handle the player inventory. This is fixed size (9 right now)
     /// </summary>
     [Serializable]
-    public class InventorySystem
+    public class InventoryHandler : UIHandlerBase<InventoryPanel>
     {
         public const int InventorySize = 9;
 
@@ -23,10 +23,18 @@ namespace Farm
 
         public InventoryEntry[] Entries;
 
+        public InventoryHandler()
+        {
+            Debug.LogError(1);
+        }
+        public override void AttachPanel(InventoryPanel panel)
+        {
+            base.AttachPanel(panel);
+        }
         public void Init()
         {
             Entries = new InventoryEntry[InventorySize];
-            for(int i = 0; i< InventorySize; i++)
+            for (int i = 0; i < InventorySize; i++)
             {
                 Entries[i] = new InventoryEntry();
             }

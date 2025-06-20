@@ -4,8 +4,11 @@ using UnityEngine;
 
 public abstract class UIHandlerBase<TPanel> : IUIHandlerBase<TPanel> where TPanel : IUIPanelBase
 {
+    protected TPanel _panel;
     public virtual void AttachPanel(TPanel panel)
     {
+        _panel = panel;
+        RegisterEvents();
     }
     public virtual void OnShow()
     {

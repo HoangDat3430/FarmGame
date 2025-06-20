@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         ShowUI<MainUI>();
+        ShowUI<InventoryPanel>();
     }
     public TPanel LoadUI<TPanel>()
         where TPanel : IUIPanelBase

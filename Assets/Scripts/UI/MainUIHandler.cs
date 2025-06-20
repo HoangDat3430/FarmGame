@@ -5,19 +5,13 @@ using UnityEngine;
 
 public class MainUIHandler : UIHandlerBase<MainUI>
 {
-    private MainUI _mainUI;
-    public override void AttachPanel(MainUI panel)
-    {
-        _mainUI = panel;
-        RegisterEvents();
-    }
     public override void OnShow()
     {
         RefreshData();
     }
     public override void RefreshData()
     {
-        _mainUI.UpdateCoin(GameManager.Instance.Player.Coins);
+        _panel.UpdateCoin(GameManager.Instance.Player.Coins);
     }
     protected override void RegisterEvents()
     {
@@ -25,6 +19,6 @@ public class MainUIHandler : UIHandlerBase<MainUI>
     }
     private void OnCoinChanged(int coin)
     {
-        _mainUI.UpdateCoin(coin);
+        _panel.UpdateCoin(coin);
     }
 }

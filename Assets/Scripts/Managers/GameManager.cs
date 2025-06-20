@@ -96,7 +96,6 @@ namespace Farm
             }
             else
             {
-                Player.Inventory.Init();
                 Player.Inventory.SetStartingInventory();
                 TerrainMgr.UnlockFields(3);
                 WorkerMgr.EmployWorker();

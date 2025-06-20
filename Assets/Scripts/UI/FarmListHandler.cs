@@ -6,19 +6,13 @@ using System;
 
 public class FarmListHandler : UIHandlerBase<FarmListView>
 {
-    private FarmListView _farmListView;
-    public override void AttachPanel(FarmListView panel)
-    {
-        _farmListView = panel;
-        RegisterEvents();
-    }
     public override void OnShow()
     {
         ShowLandList();
     }
     private void ShowLandList()
     {
-        Transform farmPanel = _farmListView.ViewPort;
+        Transform farmPanel = _panel.ViewPort;
         var farmList = GameManager.Instance.TerrainMgr.FieldGroups;
         var lockedFarms = GameManager.Instance.TerrainMgr.RemaningLock;
         bool enough = farmList.Count <= farmPanel.childCount;
@@ -27,7 +21,7 @@ public class FarmListHandler : UIHandlerBase<FarmListView>
             int diff = farmList.Count - farmPanel.childCount;
             for (int i = 0; i < diff; i++)
             {
-                GameObject.Instantiate(_farmListView.FarmTpl, farmPanel);
+                GameObject.Instantiate(_panel.FarmTpl, farmPanel);
             }
         }
         for (int i = 1; i <= farmList.Count; i++)
