@@ -88,7 +88,7 @@ namespace Farm
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI v�o Logic
             uiLogic = new UIHandler(gameUI);
             SaveSystem.SaveData saveData = SaveSystem.Load();
-            if(saveData != null)
+            if(saveData == null)
             {
                 Player.Load(saveData.PlayerData);
                 TerrainMgr.Load(saveData.TerrainData);

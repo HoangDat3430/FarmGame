@@ -99,7 +99,7 @@ public class GameUI : MonoBehaviour, IGameUI
         sellPanel.gameObject.SetActive(true);
         m_SellBtn.enabled = false;
         m_BuyBtn.enabled = true;
-        List<InventoryHandler.InventoryEntry> sellList = GameManager.Instance.Player.Inventory.GetSellableList();
+        List<InventorySystem.InventoryEntry> sellList = GameManager.Instance.Player.Inventory.GetSellableList();
         bool enough = sellList.Count <= sellPanel.childCount;
         if (!enough)
         {
@@ -216,13 +216,13 @@ public class GameUI : MonoBehaviour, IGameUI
     }
     public void UpdateInventoryVisual(bool bForce = true)
     {
-        InventoryHandler.InventoryEntry[] inventoryList = GameManager.Instance.Player.Inventory.Entries;
+        InventorySystem.InventoryEntry[] inventoryList = GameManager.Instance.Player.Inventory.Entries;
         for(int i = 0; i < inventoryList.Length; i++)
         {
             Transform slot = inventoryPanel.GetChild(i);
             if (bForce)
             {
-                InventoryHandler.InventoryEntry entry = inventoryList[i];
+                InventorySystem.InventoryEntry entry = inventoryList[i];
                 Image icon = slot.Find("Icon").GetComponent<Image>();
                 TMP_Text countT = slot.Find("Num").GetComponent<TMP_Text>();
                 string text = string.Empty;

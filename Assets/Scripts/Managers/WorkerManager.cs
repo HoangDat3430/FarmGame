@@ -13,14 +13,19 @@ public class WorkerManager : MonoBehaviour
             return m_Workers;
         }
     }
+    public int IdleWorkersCount = 0;
     private void Awake()
     {
         GameManager.Instance.WorkerMgr = this;
         m_WorkerPrefab = Resources.Load<GameObject>("Prefabs/Worker");
     }
-    void Start()
+    private void OnEnable()
     {
-        
+        EventBus.Subscribe<OnWorkerReadyEvent>(LookingForHarvestableField);
+    }
+    private void Oisable()
+    {
+        EventBus.Unsubscribe<OnWorkerReadyEvent>(LookingForHarvestableField);
     }
 
     void Update()
@@ -36,7 +41,22 @@ public class WorkerManager : MonoBehaviour
                     m_Workers[i].GoToHavest(fieldId, fieldPosition);
                     return;
                 }
-                        
+            }
+        }
+    }
+    private void LookingForHarvestableField(OnWorkerReadyEvent e)
+    { 
+        for (int i = 0; i < m_Workers.Count; i++)
+        {
+            if (m_Workers[i].IsIdle)
+            {
+                int fieldId = GameManager.Instance.TerrainMgr.GetHarvestableField();
+                if (fieldId != -1)
+                {
+                    Vector3Int fieldPosition = GameManager.Instance.TerrainMgr.AddWaitingToHarvestField(fieldId);
+                    m_Workers[i].GoToHavest(fieldId, fieldPosition);
+                    return;
+                }
             }
         }
     }

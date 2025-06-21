@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static Farm.TerrainManager;
 
 namespace Farm
 {
+    public class OnWorkerReadyEvent{}
     public class Worker : MonoBehaviour
     {
         private Vector3 m_CurrentTarget;
@@ -18,12 +20,23 @@ namespace Farm
             {
                 return m_IsIdle;
             }
+            set
+            {
+                if (m_IsIdle != value)
+                {
+                    m_IsIdle = value;
+                    if (m_IsIdle)
+                    {
+                        EventBus.Publish(new OnWorkerReadyEvent());
+                    }
+                }
+            }
         }
         // Start is called before the first frame update
         void Awake()
         {
             m_FieldToHavest = -1;
-            m_IsIdle = true;
+            IsIdle = true;
             m_HarvestTimer = 0;
             m_CurrentTarget = GameManager.Instance.WorkerMgr.transform.position;
         }
@@ -47,7 +60,7 @@ namespace Farm
             {
                 if (m_CurrentTarget != GameManager.Instance.WorkerMgr.transform.position)
                 {
-                    if(m_HarvestTimer < m_HarvestTime)
+                    if (m_HarvestTimer < m_HarvestTime)
                     {
                         m_HarvestTimer += Time.deltaTime;
                     }
@@ -63,7 +76,7 @@ namespace Farm
         }
         private void Harvest()
         {
-            if(m_FieldToHavest == -1)
+            if (m_FieldToHavest == -1)
             {
                 return;
             }
@@ -84,14 +97,14 @@ namespace Farm
         {
             m_FieldToHavest = fieldId;
             m_CurrentTarget = des;
-            m_IsIdle = false;
+            IsIdle = false;
             GameManager.Instance.UpdateIdleWorkers();
         }
         public void GoToWareHouse()
         {
             m_FieldToHavest = -1;
             m_CurrentTarget = GameManager.Instance.WorkerMgr.transform.position;
-            m_IsIdle = true;
+            IsIdle = true;
             GameManager.Instance.UpdateIdleWorkers();
         }
         public WorkerSaveData Save()
@@ -108,7 +121,7 @@ namespace Farm
         {
             transform.position = data.Position;
             m_CurrentTarget = data.CurrentTarget;
-            m_IsIdle = data.IsIdle;
+            IsIdle = data.IsIdle;
             m_HarvestTimer = data.HarvestTimer;
             m_FieldToHavest = data.FieldToHavest;
         }

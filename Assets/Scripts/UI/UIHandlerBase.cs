@@ -8,11 +8,16 @@ public abstract class UIHandlerBase<TPanel> : IUIHandlerBase<TPanel> where TPane
     public virtual void AttachPanel(TPanel panel)
     {
         _panel = panel;
+        Init();
         RegisterEvents();
+    }
+    protected virtual void Init()
+    {
+        
     }
     public virtual void OnShow()
     {
-        
+
     }
     public virtual void OnHide()
     {
