@@ -5,7 +5,14 @@ using static Farm.TerrainManager;
 
 namespace Farm
 {
-    public class OnWorkerReadyEvent{}
+    public class WorkerStateChangedEvent
+    {
+        public bool isIdle;
+        public WorkerStateChangedEvent(bool isIdle)
+        { 
+            this.isIdle = isIdle;
+        }
+    }
     public class Worker : MonoBehaviour
     {
         private Vector3 m_CurrentTarget;
@@ -25,10 +32,7 @@ namespace Farm
                 if (m_IsIdle != value)
                 {
                     m_IsIdle = value;
-                    if (m_IsIdle)
-                    {
-                        EventBus.Publish(new OnWorkerReadyEvent());
-                    }
+                    EventBus.Publish(new WorkerStateChangedEvent(value));
                 }
             }
         }
@@ -98,14 +102,12 @@ namespace Farm
             m_FieldToHavest = fieldId;
             m_CurrentTarget = des;
             IsIdle = false;
-            GameManager.Instance.UpdateIdleWorkers();
         }
         public void GoToWareHouse()
         {
             m_FieldToHavest = -1;
             m_CurrentTarget = GameManager.Instance.WorkerMgr.transform.position;
             IsIdle = true;
-            GameManager.Instance.UpdateIdleWorkers();
         }
         public WorkerSaveData Save()
         {

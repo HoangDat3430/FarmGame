@@ -22,4 +22,8 @@ public class MainUI : UIPanelBase<MainUI, MainUIHandler>
     {
         Coin.text = coin.ToString();
     }
+    public void UpdateWorkers(int count)
+    {
+        Workers.text = $"{count}/10";
+    }
 }

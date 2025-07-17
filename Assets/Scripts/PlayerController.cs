@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace Farm
 {
@@ -126,12 +127,11 @@ namespace Farm
             }
             ToggleToolVisual(true);
         }
-
         private void Update()
         {
             m_CurrentInteractiveTarget = null;
             m_HasTarget = false;
-            
+
             m_CurrentWorldMousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             //check if we are above an interactive object
             var overlapCount = Physics2D.OverlapPointNonAlloc(m_CurrentWorldMousePos, m_CollidersCache, 1 << 31);
@@ -145,7 +145,7 @@ namespace Farm
                     return;
                 }
             }
-            
+
             //If we reached here, we are not above UI or an interactive object, so set the cursor to the normal one
 
             var grid = GameManager.Instance.TerrainMgr?.Grid;
@@ -190,9 +190,13 @@ namespace Farm
             {
                 SaveSystem.Save();
             }
-            else if (Keyboard.current.f9Key.wasPressedThisFrame)
+            else if (Keyboard.current.f6Key.wasPressedThisFrame)
             {
                 SaveSystem.Load();
+            }
+            else if (Keyboard.current.f7Key.wasPressedThisFrame)
+            {
+                Debug.LogError(m_Rigidbody.position);
             }
         }
 
@@ -374,6 +378,7 @@ namespace Farm
         public void Save(ref PlayerSaveData data)
         {
             data.Position = m_Rigidbody.position;
+            Debug.LogError(m_Rigidbody.position);
             data.Coins = m_Coins;
             data.ToolLevel = m_ToolLevel;
             data.Inventory = new List<InventorySaveData>();
@@ -385,7 +390,9 @@ namespace Farm
             Coins = data.Coins;
             m_Inventory.Load(data.Inventory);
             m_ToolLevel = data.ToolLevel;
-            m_Rigidbody.position = data.Position;
+            m_Rigidbody.MovePosition(data.Position);
+            //m_Rigidbody.position = data.Position;
+            Debug.LogError(m_Rigidbody.position, m_Rigidbody.gameObject);
         }
     }
     class ItemInstance

@@ -4,6 +4,6 @@ public class FarmLock : InteractiveObject
 {
     public override void InteractedWith()
     {
-        GameManager.Instance.OpenFarmStore();
+        UIManager.Instance.ShowUI<FarmListView>();
     }
 }

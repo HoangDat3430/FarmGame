@@ -11,6 +11,14 @@ namespace Farm
     /// Manage everything related to the terrain where crop are planted. Hold the content of cells with the states of
     /// crop in those cells. Handle also switching tiles and the like where tilling and watering happens.
     /// </summary>
+    public class CropNeedToHarvestEvent
+    {
+        public int fieldID;
+        public CropNeedToHarvestEvent(int fieldID)
+        {
+            this.fieldID = fieldID;
+        }
+    }
     public class TerrainManager : MonoBehaviour
     {
         [Serializable]
@@ -241,7 +249,7 @@ namespace Farm
         {
             foreach (var field in m_FieldGroups)
             {
-                if (field.Value.Contains(target))  
+                if (field.Value.Contains(target))
                 {
                     return field.Key;
                 }
@@ -311,7 +319,7 @@ namespace Farm
                 cropData.GrowthTimer = 0.0f;
                 cropData.CurrentGrowthStage = 0;
 
-                if (i==0 && cropData.Animal == null)//Graze only 1 animal in a field, cells have the same crop data with each other.
+                if (i == 0 && cropData.Animal == null)//Graze only 1 animal in a field, cells have the same crop data with each other.
                 {
                     cropData.Animal = SpawnAnimalPrefab(cattleToGraze.CropID, target, field);
                 }
@@ -352,7 +360,7 @@ namespace Farm
             if (data.HarvestDone)
             {
                 m_CropData.Remove(target);
-                if(data.Animal != null)
+                if (data.Animal != null)
                 {
                     Destroy(data.Animal);
                 }
@@ -367,17 +375,6 @@ namespace Farm
         {
             m_CropData.TryGetValue(target, out var data);
             return data;
-        }
-
-        public void OverrideGrowthStage(Vector3Int target, int newGrowthStage)
-        {
-            var data = GetCropDataAt(target);
-
-            data.GrowthRatio = Mathf.Clamp01((newGrowthStage + 1) / (float)data.GrowingCrop.GrowthStagesTiles.Length);
-            data.GrowthTimer = data.GrowthRatio * data.GrowingCrop.GrowthTime;
-            data.CurrentGrowthStage = newGrowthStage;
-
-            UpdateCropVisual(target);
         }
         private void Update()
         {
@@ -427,11 +424,21 @@ namespace Farm
             }
             else
             {
-                if(data.Animal != null)
+                if (data.Animal != null)
                 {
                     data.DisplayAnimalProduct();
                 }
                 CropTilemap.SetTile(target, data.GrowingCrop.GrowthStagesTiles?[data.CurrentGrowthStage]);
+            }
+            if (Mathf.Approximately(data.GrowthRatio, 1.0f))
+            {
+                foreach (var field in m_FieldGroups)
+                {
+                    if (field.Value.Contains(target))
+                    {
+                        EventBus.Publish(new CropNeedToHarvestEvent(field.Key));                
+                    }
+                }
             }
         }
         public CropData GetCropDataByFieldID(int fieldID)
@@ -463,7 +470,7 @@ namespace Farm
                 if (!m_RemainingLock.ContainsKey(field.Key) && !m_WaitingToHarvestFields.Contains(field.Key))
                 {
                     CropData cropData = GetCropDataByFieldID(field.Key);
-                    if(cropData != null && Mathf.Approximately(cropData.GrowthRatio, 1.0f))
+                    if (cropData != null && Mathf.Approximately(cropData.GrowthRatio, 1.0f))
                     {
                         return field.Key;
                     }

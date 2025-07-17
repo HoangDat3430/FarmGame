@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ArabicSupport;
 using Cinemachine;
 using UnityEngine;
 
@@ -87,8 +88,11 @@ namespace Farm
             m_CurrentTimeOfTheDay = StartingTime;
             IGameUI gameUI = FindObjectOfType<GameUI>();  // Inject UI v�o Logic
             uiLogic = new UIHandler(gameUI);
-            SaveSystem.SaveData saveData = SaveSystem.Load();
-            if(saveData == null)
+            SaveSystem.Load();
+        }
+        public void Load(SaveSystem.SaveData saveData)
+        {
+            if(saveData != null)
             {
                 Player.Load(saveData.PlayerData);
                 TerrainMgr.Load(saveData.TerrainData);
@@ -100,11 +104,7 @@ namespace Farm
                 TerrainMgr.UnlockFields(3);
                 WorkerMgr.EmployWorker();
             }
-            // UpdateInventoryVisual(true);
-            // UpdateIdleWorkers();
-            // UpdateToolLevel();
         }
-
 #if UNITY_EDITOR
         private void OnDestroy()
         {
@@ -154,26 +154,6 @@ namespace Farm
         public void OpenMarket()
         {
             uiLogic.ShowMarket();
-        }
-        public void UpdateCoin()
-        {
-            uiLogic.UpdateCoin();
-        }
-        public void OpenFarmStore()
-        {
-            uiLogic.ShowLandList();
-        }
-        public void UpdateInventoryVisual(bool bForce)
-        {
-            uiLogic.UpdateInventoryVisual(bForce);
-        }
-        public void UpdateIdleWorkers()
-        {
-            uiLogic.UpdateIdleWorkers();
-        }
-        public void UpdateToolLevel()
-        {
-            uiLogic.UpdateToolLevel();
         }
         public ItemList.RowData GetItemByItemID(int itemId)
         {

@@ -24,24 +24,26 @@ namespace Farm
             GameManager.Instance.WorkerMgr.Save(ref s_CurrentData.WorkerSaveData);
 
             string savefile = Application.persistentDataPath + "/save.sav";
+            Debug.Log(savefile);
             File.WriteAllText(savefile, JsonUtility.ToJson(s_CurrentData));
         }
 
-        public static SaveData Load()
+        public static void Load()
         {
             string savefile = Application.persistentDataPath + "/save.sav";
-            if (!File.Exists(savefile)) { return null; }
-
-            string content = File.ReadAllText(savefile);
-
-            s_CurrentData = JsonUtility.FromJson<SaveData>(content);
-            return s_CurrentData;
-
-            //SceneManager.sceneLoaded += SceneLoaded;
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+            if (!File.Exists(savefile))
+            {
+                GameManager.Instance.Load(null);
+            }
+            else
+            {
+                string content = File.ReadAllText(savefile);
+                s_CurrentData = JsonUtility.FromJson<SaveData>(content);
+                GameManager.Instance.Load(s_CurrentData);
+            }
         }
 
-        static void SceneLoaded(Scene scene, LoadSceneMode mode)
+        public static void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
             GameManager.Instance.Player.Load(s_CurrentData.PlayerData);
             GameManager.Instance.TerrainMgr.Load(s_CurrentData.TerrainData);

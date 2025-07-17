@@ -16,6 +16,13 @@ public class FarmListView : UIPanelBase<FarmListView, FarmListHandler>
     {
         CloseBtn.onClick.AddListener(Hide);
     }
+    private void Update()
+    {
+        if (gameObject.activeSelf)
+        {
+            ShowLandList();
+        }
+    }
     public void ShowLandList()
     {
         var farmList = GameManager.Instance.TerrainMgr.FieldGroups;
@@ -42,7 +49,7 @@ public class FarmListView : UIPanelBase<FarmListView, FarmListHandler>
                 leftTime.transform.parent.gameObject.SetActive(false);
                 buyFarm.enabled = true;
                 buyFarm.onClick.RemoveAllListeners();
-                buyFarm.onClick.AddListener(()=> OnBuyFarm?.Invoke());
+                buyFarm.onClick.AddListener(() => OnBuyFarm?.Invoke());
             }
             else
             {

@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Farm;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 
 public class WorkerManager : MonoBehaviour
 {
@@ -21,43 +25,39 @@ public class WorkerManager : MonoBehaviour
     }
     private void OnEnable()
     {
-        EventBus.Subscribe<OnWorkerReadyEvent>(LookingForHarvestableField);
+        EventBus.Subscribe<WorkerStateChangedEvent>(LookingForHarvestableField);
+        EventBus.Subscribe<CropNeedToHarvestEvent>(LookingForIdleWorker);
     }
-    private void Oisable()
+    private void OnDisable()
     {
-        EventBus.Unsubscribe<OnWorkerReadyEvent>(LookingForHarvestableField);
+        EventBus.Unsubscribe<WorkerStateChangedEvent>(LookingForHarvestableField);
+        EventBus.Unsubscribe<CropNeedToHarvestEvent>(LookingForIdleWorker);
     }
-
-    void Update()
+    private void LookingForHarvestableField(WorkerStateChangedEvent e)
     {
-        for (int i = 0; i < m_Workers.Count; i++)
+        if (e.isIdle)
         {
-            if (m_Workers[i].IsIdle)
+            Worker worker = m_Workers.Find(x => x.IsIdle);
+            if (worker != null)
             {
                 int fieldId = GameManager.Instance.TerrainMgr.GetHarvestableField();
                 if (fieldId != -1)
                 {
                     Vector3Int fieldPosition = GameManager.Instance.TerrainMgr.AddWaitingToHarvestField(fieldId);
-                    m_Workers[i].GoToHavest(fieldId, fieldPosition);
+                    worker.GoToHavest(fieldId, fieldPosition);
                     return;
                 }
             }
         }
     }
-    private void LookingForHarvestableField(OnWorkerReadyEvent e)
-    { 
-        for (int i = 0; i < m_Workers.Count; i++)
+    private void LookingForIdleWorker(CropNeedToHarvestEvent e)
+    {
+        Worker worker = m_Workers.Find(x => x.IsIdle);
+        if (worker != null)
         {
-            if (m_Workers[i].IsIdle)
-            {
-                int fieldId = GameManager.Instance.TerrainMgr.GetHarvestableField();
-                if (fieldId != -1)
-                {
-                    Vector3Int fieldPosition = GameManager.Instance.TerrainMgr.AddWaitingToHarvestField(fieldId);
-                    m_Workers[i].GoToHavest(fieldId, fieldPosition);
-                    return;
-                }
-            }
+            Vector3Int fieldPosition = GameManager.Instance.TerrainMgr.AddWaitingToHarvestField(e.fieldID);
+            worker.GoToHavest(e.fieldID, fieldPosition);
+            return;
         }
     }
     public void EmployWorker()
@@ -89,14 +89,15 @@ public class WorkerManager : MonoBehaviour
     }
     public void Load(WorkerMgrSaveData data)
     {
-        for(int i = 0; i < data.WorkerCount; i++)
+        Workers.Clear();
+        for (int i = 0; i < data.WorkerCount; i++)
         {
             EmployWorker();
             m_Workers[i].Load(data.workerSaveDatas[i]);
         }
     }
 }
-[System.Serializable]
+[Serializable]
 public struct WorkerMgrSaveData
 {
     public List<WorkerSaveData> workerSaveDatas;
